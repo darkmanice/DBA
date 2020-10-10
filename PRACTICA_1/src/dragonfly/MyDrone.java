@@ -55,11 +55,17 @@ public class MyDrone extends IntegratedAgent {
         //ESPERAMOS RESPUESTA
         ACLMessage in = this.blockingReceive();
         String answer = in.getContent();
+        out = in.createReply();
         Info("El server dice: " + answer);
         
         json  = Json.parse(answer).asObject();
         String key = json.get("key").asString();
-        String details = json.get("details").asString();
+        
+        String details = null;
+        
+        if(json.get("details") != null){
+            details = json.get("details").asString();
+        }
         
         Info("La clave recibida es: " + key);
         
@@ -68,9 +74,50 @@ public class MyDrone extends IntegratedAgent {
             Info("Detalles del error: " + details);
         }
         
+        //Lectura de sensores
+        json = new JsonObject();
+        json.add("command", "read");
+        json.add("key", key);
+        resultado = json.toString();
+        out.setContent(resultado);
+        this.send(out);
+        
+        in = this.blockingReceive();
+        answer = in.getContent();
+        out = in.createReply();
+        
+        Info(answer);
+        
+        //CREAMOS LA ACCION
+        String command2 = "execute";
+        String accion = "rotateL";
+        
+        json = new JsonObject();
+        json.add("command", command2);
+        json.add("action", accion);
+        json.add("key", key);
+        resultado = json.toString();
         
         
+        //ENVIAMOS LA ACCION
+        out.setContent(resultado);
+        this.send(out);
         
+        Info(resultado);
+        
+        //ESPERAMOS RESPUESTA
+        in = this.blockingReceive();
+        answer = in.getContent();
+        Info("El server dice: " + answer);
+        
+        json  = Json.parse(answer).asObject();
+        String result = json.get("result").asString();
+        
+        Info("Resultado de la accion: " + result);
+        
+        if(result == "ok"){
+            logout(out);
+        }
         
         
         
@@ -91,6 +138,17 @@ public class MyDrone extends IntegratedAgent {
         this.doCheckoutLARVA();
         this.doCheckoutPlatform();
         super.takeDown();
+    }
+    
+    private void logout(ACLMessage out){
+        JsonObject json = new JsonObject();
+        json.add("command", "logout");
+        String resultado = json.toString();
+        
+        out.setContent(resultado);
+        
+        Info("Sesion cerrada"); 
+        this.send(out);
     }
 
 

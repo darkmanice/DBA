@@ -13,7 +13,7 @@ public class DRAGONFLY {
         ConsoleBoot app = new ConsoleBoot("DRAGONFLY", args);
         app.selectConnection();
         
-        app.launchAgent("aaaaa74384999", MyDrone.class);
+        app.launchAgent("74384999", MyDrone.class);
         app.shutDown();        
     }
 }
