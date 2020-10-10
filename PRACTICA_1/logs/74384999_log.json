@@ -1,0 +1,95 @@
+{"date":"30/09/2020_13:08:43","record":{"agent":"74384999","info":"\nHACKATHON AND EXAM PROTOCOL\n"}}
+{"date":"30/09/2020_13:08:43","record":{"agent":"74384999","info":"Trying to checkin in the platform"}}
+{"date":"30/09/2020_13:08:43","record":{"agent":"74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"30/09/2020_13:08:44","record":{"agent":"74384999","info":"Chekin confirmed in the platform"}}
+{"date":"30/09/2020_13:08:44","record":{"agent":"74384999","info":"Trying to register in LARVA"}}
+{"date":"30/09/2020_13:08:44","record":{"agent":"74384999","info":"Found assignmentid 0"}}
+{"date":"30/09/2020_13:08:44","record":{"agent":"74384999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics assignmentid 0>"}}
+{"date":"30/09/2020_13:08:44","record":{"agent":"74384999","info":"LARVA Agent Mutenroshi found. Requesting registration"}}
+{"date":"30/09/2020_13:22:26","record":{"agent":"74384999","info":"\nHACKATHON AND EXAM PROTOCOL\n"}}
+{"date":"30/09/2020_13:22:26","record":{"agent":"74384999","info":"Trying to checkin in the platform"}}
+{"date":"30/09/2020_13:22:26","record":{"agent":"74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"30/09/2020_13:22:27","record":{"agent":"74384999","info":"Chekin confirmed in the platform"}}
+{"date":"30/09/2020_13:22:27","record":{"agent":"74384999","info":"Trying to register in LARVA"}}
+{"date":"30/09/2020_13:22:27","record":{"agent":"74384999","info":"Found assignmentid 0"}}
+{"date":"30/09/2020_13:22:27","record":{"agent":"74384999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics assignmentid 0>"}}
+{"date":"30/09/2020_13:22:27","record":{"agent":"74384999","info":"LARVA Agent Mutenroshi found. Requesting registration"}}
+{"date":"30/09/2020_13:22:28","record":{"agent":"74384999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"30/09/2020_13:22:29","record":{"agent":"74384999","info":"Hello World!"}}
+{"date":"30/09/2020_13:22:29","record":{"agent":"74384999","info":"Waiting 5000 msecs for the agent to die "}}
+{"date":"30/09/2020_13:22:34","record":{"agent":"74384999","info":"Requesting unregistration in LARVA"}}
+{"date":"30/09/2020_13:22:36","record":{"agent":"74384999","info":"Couldn't confirm unregistration in LARVA"}}
+{"date":"30/09/2020_13:22:36","record":{"agent":"74384999","info":"Reporting FAILURE Couldn't confirm unregistration in LARVA"}}
+{"date":"30/09/2020_13:22:36","record":{"agent":"74384999","info":"Trying to checkout from the platform"}}
+{"date":"30/09/2020_13:22:36","record":{"agent":"74384999","info":"Checked-out from the platform"}}
+{"date":"30/09/2020_13:26:21","record":{"agent":"74384999","info":"\nHACKATHON AND EXAM PROTOCOL\n"}}
+{"date":"30/09/2020_13:26:21","record":{"agent":"74384999","info":"Trying to checkin in the platform"}}
+{"date":"30/09/2020_13:26:21","record":{"agent":"74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"30/09/2020_13:26:21","record":{"agent":"74384999","info":"Chekin confirmed in the platform"}}
+{"date":"30/09/2020_13:26:21","record":{"agent":"74384999","info":"Trying to register in LARVA"}}
+{"date":"30/09/2020_13:26:21","record":{"agent":"74384999","info":"Found assignmentid 0"}}
+{"date":"30/09/2020_13:26:21","record":{"agent":"74384999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics assignmentid 0>"}}
+{"date":"30/09/2020_13:26:21","record":{"agent":"74384999","info":"LARVA Agent Mutenroshi found. Requesting registration"}}
+{"date":"30/09/2020_13:26:22","record":{"agent":"74384999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"30/09/2020_13:26:22","record":{"agent":"74384999","info":"Hello World!"}}
+{"date":"30/09/2020_13:26:22","record":{"agent":"74384999","info":"Waiting 5000 msecs for the agent to die "}}
+{"date":"30/09/2020_13:26:27","record":{"agent":"74384999","info":"Requesting unregistration in LARVA"}}
+{"date":"30/09/2020_13:26:29","record":{"agent":"74384999","info":"Couldn't confirm unregistration in LARVA"}}
+{"date":"30/09/2020_13:26:29","record":{"agent":"74384999","info":"Reporting FAILURE Couldn't confirm unregistration in LARVA"}}
+{"date":"30/09/2020_13:26:29","record":{"agent":"74384999","info":"Trying to checkout from the platform"}}
+{"date":"30/09/2020_13:26:29","record":{"agent":"74384999","info":"Checked-out from the platform"}}
+{"date":"30/09/2020_13:29:19","record":{"agent":"74384999","info":"\nHACKATHON AND EXAM PROTOCOL\n"}}
+{"date":"30/09/2020_13:29:19","record":{"agent":"74384999","info":"Trying to checkin in the platform"}}
+{"date":"30/09/2020_13:29:19","record":{"agent":"74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"30/09/2020_13:29:20","record":{"agent":"74384999","info":"Chekin confirmed in the platform"}}
+{"date":"30/09/2020_13:29:20","record":{"agent":"74384999","info":"Trying to register in LARVA"}}
+{"date":"30/09/2020_13:29:20","record":{"agent":"74384999","info":"Found assignmentid 0"}}
+{"date":"30/09/2020_13:29:20","record":{"agent":"74384999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics assignmentid 0>"}}
+{"date":"30/09/2020_13:29:20","record":{"agent":"74384999","info":"LARVA Agent Mutenroshi found. Requesting registration"}}
+{"date":"30/09/2020_13:29:21","record":{"agent":"74384999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"30/09/2020_13:29:21","record":{"agent":"74384999","info":"Hello World!"}}
+{"date":"30/09/2020_13:29:21","record":{"agent":"74384999","info":"Waiting 5000 msecs for the agent to die "}}
+{"date":"30/09/2020_13:29:26","record":{"agent":"74384999","info":"Requesting unregistration in LARVA"}}
+{"date":"30/09/2020_13:29:27","record":{"agent":"74384999","info":"Succesfully unregistered in LARVA"}}
+{"date":"30/09/2020_13:29:27","record":{"agent":"74384999","info":"Trying to checkout from the platform"}}
+{"date":"30/09/2020_13:29:27","record":{"agent":"74384999","info":"Checked-out from the platform"}}
+{"date":"30/09/2020_13:32:18","record":{"agent":"74384999","info":"\nHACKATHON AND EXAM PROTOCOL\n"}}
+{"date":"30/09/2020_13:32:18","record":{"agent":"74384999","info":"Trying to checkin in the platform"}}
+{"date":"30/09/2020_13:32:18","record":{"agent":"74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"30/09/2020_13:32:18","record":{"agent":"74384999","info":"Chekin confirmed in the platform"}}
+{"date":"30/09/2020_13:32:18","record":{"agent":"74384999","info":"Trying to register in LARVA"}}
+{"date":"30/09/2020_13:32:18","record":{"agent":"74384999","info":"Found assignmentid 0"}}
+{"date":"30/09/2020_13:32:18","record":{"agent":"74384999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics assignmentid 0>"}}
+{"date":"30/09/2020_13:32:19","record":{"agent":"74384999","info":"LARVA Agent Goku found. Requesting registration"}}
+{"date":"30/09/2020_13:32:19","record":{"agent":"74384999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"30/09/2020_13:32:19","record":{"agent":"74384999","info":"Hello World!"}}
+{"date":"30/09/2020_13:32:19","record":{"agent":"74384999","info":"Waiting 5000 msecs for the agent to die "}}
+{"date":"30/09/2020_13:32:24","record":{"agent":"74384999","info":"Requesting unregistration in LARVA"}}
+{"date":"30/09/2020_13:32:24","record":{"agent":"74384999","info":"Succesfully unregistered in LARVA"}}
+{"date":"30/09/2020_13:32:24","record":{"agent":"74384999","info":"Trying to checkout from the platform"}}
+{"date":"30/09/2020_13:32:24","record":{"agent":"74384999","info":"Checked-out from the platform"}}
+{"date":"30/09/2020_13:36:38","record":{"agent":"74384999","info":"\nHACKATHON AND EXAM PROTOCOL\n"}}
+{"date":"30/09/2020_13:36:38","record":{"agent":"74384999","info":"Trying to checkin in the platform"}}
+{"date":"30/09/2020_13:36:38","record":{"agent":"74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"30/09/2020_13:36:38","record":{"agent":"74384999","info":"Chekin confirmed in the platform"}}
+{"date":"30/09/2020_13:36:38","record":{"agent":"74384999","info":"Trying to register in LARVA"}}
+{"date":"30/09/2020_13:36:38","record":{"agent":"74384999","info":"Found assignmentid 0"}}
+{"date":"30/09/2020_13:36:38","record":{"agent":"74384999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics assignmentid 0>"}}
+{"date":"30/09/2020_13:36:39","record":{"agent":"74384999","info":"LARVA Agent Goku found. Requesting registration"}}
+{"date":"30/09/2020_13:36:39","record":{"agent":"74384999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"30/09/2020_13:36:39","record":{"agent":"74384999","info":"Hello World!"}}
+{"date":"30/09/2020_13:36:39","record":{"agent":"74384999","info":"Waiting 5000 msecs for the agent to die "}}
+{"date":"30/09/2020_13:36:44","record":{"agent":"74384999","info":"Requesting unregistration in LARVA"}}
+{"date":"30/09/2020_13:36:44","record":{"agent":"74384999","info":"Succesfully unregistered in LARVA"}}
+{"date":"30/09/2020_13:36:44","record":{"agent":"74384999","info":"Trying to checkout from the platform"}}
+{"date":"30/09/2020_13:36:44","record":{"agent":"74384999","info":"Checked-out from the platform"}}
+{"date":"30/09/2020_13:37:47","record":{"agent":"74384999","info":"\nHACKATHON AND EXAM PROTOCOL\n"}}
+{"date":"30/09/2020_13:37:47","record":{"agent":"74384999","info":"Trying to checkin in the platform"}}
+{"date":"30/09/2020_13:37:47","record":{"agent":"74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"30/09/2020_13:37:47","record":{"agent":"74384999","info":"Chekin confirmed in the platform"}}
+{"date":"30/09/2020_13:37:47","record":{"agent":"74384999","info":"Trying to register in LARVA"}}
+{"date":"30/09/2020_13:37:47","record":{"agent":"74384999","info":"Found assignmentid 0"}}
+{"date":"30/09/2020_13:37:47","record":{"agent":"74384999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics assignmentid 0>"}}
+{"date":"30/09/2020_13:37:48","record":{"agent":"74384999","info":"LARVA Agent Songoanda found. Requesting registration"}}
+{"date":"30/09/2020_13:37:50","record":{"agent":"74384999","info":"Couldn't confirm registration in LARVA"}}
+{"date":"30/09/2020_13:37:50","record":{"agent":"74384999","info":"Reporting FAILURE Couldn't confirm registration in LARVA"}}

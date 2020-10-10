@@ -1,0 +1,2 @@
+{"date":"30/09/2020_12:54:47","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 74384999 jade.security.JADESecurityException: Name-clash Agent 74384999@ISG2 already present in the platform "}}
+{"date":"30/09/2020_13:38:27","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 74384999 jade.security.JADESecurityException: Name-clash Agent 74384999@ISG2 already present in the platform "}}
