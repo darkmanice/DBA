@@ -93,3 +93,8 @@
 {"date":"30/09/2020_13:37:48","record":{"agent":"74384999","info":"LARVA Agent Songoanda found. Requesting registration"}}
 {"date":"30/09/2020_13:37:50","record":{"agent":"74384999","info":"Couldn't confirm registration in LARVA"}}
 {"date":"30/09/2020_13:37:50","record":{"agent":"74384999","info":"Reporting FAILURE Couldn't confirm registration in LARVA"}}
+{"date":"10/10/2020_11:31:19","record":{"agent":"74384999","info":"\nHACKATHON AND EXAM PROTOCOL\n"}}
+{"date":"10/10/2020_11:31:19","record":{"agent":"74384999","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_11:31:19","record":{"agent":"74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_11:31:21","record":{"agent":"74384999","info":"Agent AgentIdentityManager does not answer"}}
+{"date":"10/10/2020_11:31:21","record":{"agent":"74384999","info":"Reporting FAILURE Agent AgentIdentityManager does not answer"}}

@@ -1,0 +1,20 @@
+{"date":"10/10/2020_12:21:52","record":{"agent":"aaaaa74384999","info":"Load configuration"}}
+{"date":"10/10/2020_12:21:52","record":{"agent":"aaaaa74384999","info":"Found CardID"}}
+{"date":"10/10/2020_12:21:52","record":{"agent":"aaaaa74384999","info":"CardID: gz3Tj6YD6fTuzLXm which belongs to  ()"}}
+{"date":"10/10/2020_12:21:52","record":{"agent":"aaaaa74384999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_12:21:52","record":{"agent":"aaaaa74384999","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_12:21:52","record":{"agent":"aaaaa74384999","info":"Enviando credenciales"}}
+{"date":"10/10/2020_12:21:52","record":{"agent":"aaaaa74384999","info":"{\"command\":\"login\",\"world\":\"BasePlayground\",\"attach\":[\"alive\",\"distance\",\"altimeter\"]}"}}
+{"date":"10/10/2020_12:21:52","record":{"agent":"aaaaa74384999","info":"Enviado"}}
+{"date":"10/10/2020_12:25:58","record":{"agent":"aaaaa74384999","info":"Requesting unregistration in LARVA"}}
+{"date":"10/10/2020_12:26:00","record":{"agent":"aaaaa74384999","info":"Couldn't confirm unregistration in LARVA"}}
+{"date":"10/10/2020_12:26:00","record":{"agent":"aaaaa74384999","info":"Trying to checkout from the platform"}}
+{"date":"10/10/2020_12:26:00","record":{"agent":"aaaaa74384999","info":"Checked-out from the platform"}}
+{"date":"10/10/2020_12:26:00","record":{"agent":"aaaaa74384999","info":"Take down"}}
+{"date":"10/10/2020_12:26:06","record":{"agent":"aaaaa74384999","info":"Load configuration"}}
+{"date":"10/10/2020_12:26:06","record":{"agent":"aaaaa74384999","info":"Found CardID"}}
+{"date":"10/10/2020_12:26:06","record":{"agent":"aaaaa74384999","info":"CardID: gz3Tj6YD6fTuzLXm which belongs to  ()"}}
+{"date":"10/10/2020_12:26:06","record":{"agent":"aaaaa74384999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_12:26:06","record":{"agent":"aaaaa74384999","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_12:26:06","record":{"agent":"aaaaa74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_12:26:08","record":{"agent":"aaaaa74384999","info":"Agent AgentIdentityManager does not answer"}}

@@ -55,3 +55,8 @@
 {"date":"30/09/2020_13:59:30","record":{"agent":"a74384999","info":"Reporting FAILURE Couldn't confirm unregistration in LARVA"}}
 {"date":"30/09/2020_13:59:30","record":{"agent":"a74384999","info":"Trying to checkout from the platform"}}
 {"date":"30/09/2020_13:59:30","record":{"agent":"a74384999","info":"Checked-out from the platform"}}
+{"date":"10/10/2020_11:32:30","record":{"agent":"a74384999","info":"\nHACKATHON AND EXAM PROTOCOL\n"}}
+{"date":"10/10/2020_11:32:30","record":{"agent":"a74384999","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_11:32:30","record":{"agent":"a74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_11:32:32","record":{"agent":"a74384999","info":"Agent AgentIdentityManager does not answer"}}
+{"date":"10/10/2020_11:32:32","record":{"agent":"a74384999","info":"Reporting FAILURE Agent AgentIdentityManager does not answer"}}

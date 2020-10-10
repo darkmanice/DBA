@@ -1,2 +1,6 @@
 {"date":"30/09/2020_12:54:47","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 74384999 jade.security.JADESecurityException: Name-clash Agent 74384999@ISG2 already present in the platform "}}
 {"date":"30/09/2020_13:38:27","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 74384999 jade.security.JADESecurityException: Name-clash Agent 74384999@ISG2 already present in the platform "}}
+{"date":"10/10/2020_11:32:07","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 74384999 jade.security.JADESecurityException: Name-clash Agent 74384999@ISG2 already present in the platform "}}
+{"date":"10/10/2020_11:35:34","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT a74384999 jade.security.JADESecurityException: Name-clash Agent a74384999@ISG2 already present in the platform "}}
+{"date":"10/10/2020_12:20:26","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT aaa74384999 jade.security.JADESecurityException: Name-clash Agent aaa74384999@ISG2 already present in the platform "}}
+{"date":"10/10/2020_12:21:34","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT aaaa74384999 jade.security.JADESecurityException: Name-clash Agent aaaa74384999@ISG2 already present in the platform "}}

@@ -10,10 +10,10 @@ import AppBoot.ConsoleBoot;
 public class DRAGONFLY {
 
     public static void main(String[] args) {
-        ConsoleBoot app = new ConsoleBoot("", args);
+        ConsoleBoot app = new ConsoleBoot("DRAGONFLY", args);
         app.selectConnection();
         
-        app.launchAgent("74384999", MyDrone.class);
+        app.launchAgent("aaaaa74384999", MyDrone.class);
         app.shutDown();        
     }
 }

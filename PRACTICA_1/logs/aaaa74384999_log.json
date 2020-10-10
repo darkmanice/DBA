@@ -1,0 +1,7 @@
+{"date":"10/10/2020_12:21:05","record":{"agent":"aaaa74384999","info":"Load configuration"}}
+{"date":"10/10/2020_12:21:05","record":{"agent":"aaaa74384999","info":"Found CardID"}}
+{"date":"10/10/2020_12:21:05","record":{"agent":"aaaa74384999","info":"CardID: gz3Tj6YD6fTuzLXm which belongs to  ()"}}
+{"date":"10/10/2020_12:21:05","record":{"agent":"aaaa74384999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_12:21:05","record":{"agent":"aaaa74384999","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_12:21:05","record":{"agent":"aaaa74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_12:21:07","record":{"agent":"aaaa74384999","info":"Agent AgentIdentityManager does not answer"}}
