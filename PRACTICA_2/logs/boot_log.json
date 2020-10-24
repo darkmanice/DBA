@@ -5,3 +5,4 @@
 {"date":"10/10/2020_12:20:26","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT aaa74384999 jade.security.JADESecurityException: Name-clash Agent aaa74384999@ISG2 already present in the platform "}}
 {"date":"10/10/2020_12:21:34","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT aaaa74384999 jade.security.JADESecurityException: Name-clash Agent aaaa74384999@ISG2 already present in the platform "}}
 {"date":"10/10/2020_12:31:03","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT aaaaa74384999 jade.security.JADESecurityException: Name-clash Agent aaaaa74384999@ISG2 already present in the platform "}}
+{"date":"24/10/2020_14:43:04","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 743849999 jade.security.JADESecurityException: Name-clash Agent 743849999@DBA already present in the platform "}}

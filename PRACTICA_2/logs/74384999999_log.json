@@ -1,0 +1,22 @@
+{"date":"24/10/2020_14:45:58","record":{"agent":"74384999999","info":"Load configuration"}}
+{"date":"24/10/2020_14:45:58","record":{"agent":"74384999999","info":"Found CardID"}}
+{"date":"24/10/2020_14:45:58","record":{"agent":"74384999999","info":"CardID: gItAiFDZFAAnIA83 which belongs to ROMAN LARROSA LEWANDOWSKA (Cellnex)"}}
+{"date":"24/10/2020_14:45:58","record":{"agent":"74384999999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"24/10/2020_14:45:58","record":{"agent":"74384999999","info":"Trying to checkin in the platform"}}
+{"date":"24/10/2020_14:45:58","record":{"agent":"74384999999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"24/10/2020_14:45:58","record":{"agent":"74384999999","info":"Chekin confirmed in the platform"}}
+{"date":"24/10/2020_14:45:58","record":{"agent":"74384999999","info":"Trying to register in LARVA"}}
+{"date":"24/10/2020_14:45:58","record":{"agent":"74384999999","info":"Found ASSIGNMENTID 2"}}
+{"date":"24/10/2020_14:45:58","record":{"agent":"74384999999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 2>"}}
+{"date":"24/10/2020_14:45:59","record":{"agent":"74384999999","info":"LARVA Agent Cellnex found. Requesting registration"}}
+{"date":"24/10/2020_14:45:59","record":{"agent":"74384999999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"24/10/2020_14:45:59","record":{"agent":"74384999999","info":"Behaviour REGULAR starts"}}
+{"date":"24/10/2020_14:45:59","record":{"agent":"74384999999","info":"Enviando credenciales"}}
+{"date":"24/10/2020_14:45:59","record":{"agent":"74384999999","info":"Enviada petición de login"}}
+{"date":"24/10/2020_14:45:59","record":{"agent":"74384999999","info":"******************************************{\"result\":\"ok\",\"key\":\"zgqJjZb2\",\"width\":100,\"height\":100,\"maxflight\":256,\"capabilities\":[\"moveF\",\"rotateL\",\"rotateR\",\"moveUP\",\"moveD\",\"touchD\",\"recharge\",\"rescue\",\"status\",\"trace\",\"alive\",\"distance\",\"altimeter\"]}"}}
+{"date":"24/10/2020_14:45:59","record":{"agent":"74384999999","info":"La key almacenada es zgqJjZb2"}}
+{"date":"24/10/2020_14:45:59","record":{"agent":"74384999999","info":"Requesting unregistration in LARVA"}}
+{"date":"24/10/2020_14:45:59","record":{"agent":"74384999999","info":"Succesfully unregistered in LARVA"}}
+{"date":"24/10/2020_14:46:03","record":{"agent":"74384999999","info":"Trying to checkout from the platform"}}
+{"date":"24/10/2020_14:46:03","record":{"agent":"74384999999","info":"Checked-out from the platform"}}
+{"date":"24/10/2020_14:46:03","record":{"agent":"74384999999","info":"Take down"}}

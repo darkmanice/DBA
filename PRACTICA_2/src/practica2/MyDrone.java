@@ -15,7 +15,7 @@ public class MyDrone extends IntegratedAgent {
     private String receiver;
     private String key;
     private TTYControlPanel myControlPanel;
-    private int width, height, maxheight;
+    private int width, height, maxflight;
     
     private int mundo[][];
     private int position;
@@ -28,7 +28,7 @@ public class MyDrone extends IntegratedAgent {
         receiver = this.whoLarvaAgent();
         
         //Panel de control
-        myControlPanel = new TTYControlPanel(getAID());
+        myControlPanel = new TTYControlPanel(this.getAID());
     }
 
     @Override
@@ -148,13 +148,16 @@ public class MyDrone extends IntegratedAgent {
         //ESPERAMOS RESPUESTA
         ACLMessage in = this.blockingReceive();
         Info("******************************************" + in.getContent());
-        key = Json.parse(in.getContent()).asObject().get("key").asString();
+        
+        json = Json.parse(in.getContent()).asObject();
+        key = json.get("key").asString();
+        
         
         Info("La key almacenada es " + key);
         width = json.get("width").asInt();
         height = json.get("height").asInt();
-        maxheight = json.get("maxheight").asInt();
-        myControlPanel.feedData(in, width, height, maxheight);
+        maxflight = json.get("maxflight").asInt();
+        myControlPanel.feedData(in, width, height, maxflight);
         return in;
     }
     
@@ -171,14 +174,20 @@ public class MyDrone extends IntegratedAgent {
         json = Json.parse(answer).asObject();
         out = in.createReply();
         
+        Info("La lectora de sensores es: " + answer);
+        
         myControlPanel.feedData(in);
         myControlPanel.fancyShow();
         
-        //Actualizacion de los sensores (en caso de que estén)
-        for (JsonValue j: json.get("perceptions").asArray()){
-            //switch (j.asObject().get("sensor")) {
-                
-            //}
+        //Actualizacion de los sensores 
+        for (JsonValue j: json.get("details").asObject().get("perceptions").asArray()){
+            switch (j.asObject().get("sensor").asString()) {
+                case ("alive"):
+                    
+                    break;
+                case("..."):
+                    break;
+            }
         }
         
         return json;
