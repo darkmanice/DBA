@@ -3,3 +3,5 @@ SAMPLE.cardID
 /PRACTICA_1/dist/
 *.log
 *.lock
+/PRACTICA_2/build/
+/PRACTICA_2/dist/

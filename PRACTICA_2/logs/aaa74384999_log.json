@@ -1,0 +1,32 @@
+{"date":"10/10/2020_11:43:16","record":{"agent":"aaa74384999","info":"Load configuration"}}
+{"date":"10/10/2020_11:43:16","record":{"agent":"aaa74384999","info":"Found CardID"}}
+{"date":"10/10/2020_11:43:16","record":{"agent":"aaa74384999","info":"CardID: gz3Tj6YD6fTuzLXm which belongs to  ()"}}
+{"date":"10/10/2020_11:43:16","record":{"agent":"aaa74384999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_11:43:16","record":{"agent":"aaa74384999","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_11:43:16","record":{"agent":"aaa74384999","info":"Enviando credenciales"}}
+{"date":"10/10/2020_11:49:17","record":{"agent":"aaa74384999","info":"Take down"}}
+{"date":"10/10/2020_12:06:47","record":{"agent":"aaa74384999","info":"Load configuration"}}
+{"date":"10/10/2020_12:06:47","record":{"agent":"aaa74384999","info":"Found CardID"}}
+{"date":"10/10/2020_12:06:47","record":{"agent":"aaa74384999","info":"CardID: gz3Tj6YD6fTuzLXm which belongs to  ()"}}
+{"date":"10/10/2020_12:06:47","record":{"agent":"aaa74384999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_12:06:47","record":{"agent":"aaa74384999","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_12:06:47","record":{"agent":"aaa74384999","info":"Enviando credenciales"}}
+{"date":"10/10/2020_12:06:47","record":{"agent":"aaa74384999","info":"{\"command\":\"login\",\"world\":\"BasePlayground\",\"attach\":[\"alive\",\"distance\",\"altimeter\"]}"}}
+{"date":"10/10/2020_12:06:47","record":{"agent":"aaa74384999","info":"Enviado"}}
+{"date":"10/10/2020_12:07:27","record":{"agent":"aaa74384999","info":"Take down"}}
+{"date":"10/10/2020_12:08:43","record":{"agent":"aaa74384999","info":"Load configuration"}}
+{"date":"10/10/2020_12:08:43","record":{"agent":"aaa74384999","info":"Found CardID"}}
+{"date":"10/10/2020_12:08:43","record":{"agent":"aaa74384999","info":"CardID: gz3Tj6YD6fTuzLXm which belongs to  ()"}}
+{"date":"10/10/2020_12:08:43","record":{"agent":"aaa74384999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_12:08:43","record":{"agent":"aaa74384999","info":"Behaviour REGULAR starts"}}
+{"date":"10/10/2020_12:08:43","record":{"agent":"aaa74384999","info":"Enviando credenciales"}}
+{"date":"10/10/2020_12:08:43","record":{"agent":"aaa74384999","info":"{\"command\":\"login\",\"world\":\"BasePlayground\",\"attach\":[\"alive\",\"distance\",\"altimeter\"]}"}}
+{"date":"10/10/2020_12:08:43","record":{"agent":"aaa74384999","info":"Enviado"}}
+{"date":"10/10/2020_12:13:11","record":{"agent":"aaa74384999","info":"Take down"}}
+{"date":"10/10/2020_12:13:40","record":{"agent":"aaa74384999","info":"Load configuration"}}
+{"date":"10/10/2020_12:13:40","record":{"agent":"aaa74384999","info":"Found CardID"}}
+{"date":"10/10/2020_12:13:40","record":{"agent":"aaa74384999","info":"CardID: gz3Tj6YD6fTuzLXm which belongs to  ()"}}
+{"date":"10/10/2020_12:13:40","record":{"agent":"aaa74384999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"10/10/2020_12:13:40","record":{"agent":"aaa74384999","info":"Trying to checkin in the platform"}}
+{"date":"10/10/2020_12:13:40","record":{"agent":"aaa74384999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"10/10/2020_12:13:43","record":{"agent":"aaa74384999","info":"Agent AgentIdentityManager does not answer"}}
