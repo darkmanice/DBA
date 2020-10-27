@@ -176,8 +176,8 @@ public class MyDrone extends IntegratedAgent {
         
         Info("La lectora de sensores es: " + answer);
         
-        myControlPanel.feedData(in);
-        myControlPanel.fancyShow();
+        myControlPanel.feedData(in, width, height, maxflight);
+        //myControlPanel.fancyShow();
         
         //Actualizacion de los sensores 
         for (JsonValue j: json.get("details").asObject().get("perceptions").asArray()){

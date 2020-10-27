@@ -57,3 +57,15 @@
 {"date":"24/10/2020_14:59:07","record":{"agent":"743849999999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 2>"}}
 {"date":"24/10/2020_14:59:07","record":{"agent":"743849999999","info":"LARVA Agent Cellnex found. Requesting registration"}}
 {"date":"24/10/2020_14:59:07","record":{"agent":"743849999999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"25/10/2020_18:56:39","record":{"agent":"743849999999","info":"Load configuration"}}
+{"date":"25/10/2020_18:56:39","record":{"agent":"743849999999","info":"Found CardID"}}
+{"date":"25/10/2020_18:56:39","record":{"agent":"743849999999","info":"CardID: gItAiFDZFAAnIA83 which belongs to ROMAN LARROSA LEWANDOWSKA (Cellnex)"}}
+{"date":"25/10/2020_18:56:39","record":{"agent":"743849999999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"25/10/2020_18:56:39","record":{"agent":"743849999999","info":"Trying to checkin in the platform"}}
+{"date":"25/10/2020_18:56:39","record":{"agent":"743849999999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"25/10/2020_18:56:40","record":{"agent":"743849999999","info":"Chekin confirmed in the platform"}}
+{"date":"25/10/2020_18:56:40","record":{"agent":"743849999999","info":"Trying to register in LARVA"}}
+{"date":"25/10/2020_18:56:40","record":{"agent":"743849999999","info":"Found ASSIGNMENTID 2"}}
+{"date":"25/10/2020_18:56:40","record":{"agent":"743849999999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 2>"}}
+{"date":"25/10/2020_18:56:40","record":{"agent":"743849999999","info":"LARVA Agent Cellnex found. Requesting registration"}}
+{"date":"25/10/2020_18:56:40","record":{"agent":"743849999999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
