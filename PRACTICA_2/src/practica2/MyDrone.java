@@ -9,6 +9,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +40,7 @@ public class MyDrone extends IntegratedAgent {
         ACLMessage out = new ACLMessage();
         
         //Decision de los sensores con los que se loguea en el mundo
-        String attach[] = {"alive", "distance", "altimeter", "gps", "visual"};
+        String attach[] = {"alive", "distance", "altimeter", "gps", "visual", "angular", "compass"};
         
         //Iniciar sesion en el mundo
         ACLMessage in = login(out, "Playground1", attach);
@@ -85,18 +86,30 @@ public class MyDrone extends IntegratedAgent {
         //ESPERAMOS RESPUESTA
         in = this.blockingReceive();
         answer = in.getContent();
+        
+        //ENVIAMOS LA ACCION
+        out.setContent(resultado);
+        this.send(out);
+        
+        //ESPERAMOS RESPUESTA
+        in = this.blockingReceive();
+        answer = in.getContent();
         Info("El server dice: " + answer);
         
         for(int i=0; i<200; i++){
+            
+            json = readSensores(out, in);
+            Scanner sc = new Scanner(System.in);
+            
             try {
                 //leemos sensores
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(MyDrone.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            json = readSensores(out, in);
             //Info(answer);
+            sc.nextLine();
             
             //Vamos hacia delante
             json = new JsonObject();
@@ -104,6 +117,8 @@ public class MyDrone extends IntegratedAgent {
             json.add("action", "moveF");
             json.add("key", key);
             resultado = json.toString();
+            
+            Info("********" + resultado);
 
             //ENVIAMOS LA ACCION
             out.setContent(resultado);
@@ -112,7 +127,8 @@ public class MyDrone extends IntegratedAgent {
             //ESPERAMOS RESPUESTA
             in = this.blockingReceive();
             answer = in.getContent();
-            //Info("El server dice: " + answer);
+            Info("++++++++++++El server dice: " + answer);
+            
         }
 
         logout(out);
@@ -179,7 +195,7 @@ public class MyDrone extends IntegratedAgent {
         height = json.get("height").asInt();
         maxflight = json.get("maxflight").asInt();
         myControlPanel.feedData(in, width, height, maxflight);
-        //myControlPanel.fancyShow();
+        
         return in;
     }
     
@@ -196,11 +212,12 @@ public class MyDrone extends IntegratedAgent {
         json = Json.parse(answer).asObject();
         out = in.createReply();
         
-        Info("La lectora de sensores es: " + answer);
+        //Info("La lectora de sensores es: " + answer);
         
         myControlPanel.feedData(in, width, height, maxflight);
+        myControlPanel.fancyShow();
         
-        
+        /*
         //Actualizacion de los sensores 
         for (JsonValue j: json.get("details").asObject().get("perceptions").asArray()){
             switch (j.asObject().get("sensor").asString()) {
@@ -211,6 +228,7 @@ public class MyDrone extends IntegratedAgent {
                     break;
             }
         }
+        */
         
         return json;
     }

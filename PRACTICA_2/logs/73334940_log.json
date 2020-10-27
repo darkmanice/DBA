@@ -1,0 +1,21 @@
+{"date":"27/10/2020_18:11:58","record":{"agent":"73334940","info":"Load configuration"}}
+{"date":"27/10/2020_18:11:58","record":{"agent":"73334940","info":"Found CardID"}}
+{"date":"27/10/2020_18:11:58","record":{"agent":"73334940","info":"CardID: gItAiFDZFAAnIA83 which belongs to ROMAN LARROSA LEWANDOWSKA (Cellnex)"}}
+{"date":"27/10/2020_18:11:58","record":{"agent":"73334940","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"27/10/2020_18:11:58","record":{"agent":"73334940","info":"Trying to checkin in the platform"}}
+{"date":"27/10/2020_18:11:58","record":{"agent":"73334940","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"27/10/2020_18:11:58","record":{"agent":"73334940","info":"Chekin confirmed in the platform"}}
+{"date":"27/10/2020_18:11:58","record":{"agent":"73334940","info":"Trying to register in LARVA"}}
+{"date":"27/10/2020_18:11:58","record":{"agent":"73334940","info":"Found ASSIGNMENTID 2"}}
+{"date":"27/10/2020_18:11:58","record":{"agent":"73334940","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 2>"}}
+{"date":"27/10/2020_18:11:59","record":{"agent":"73334940","info":"LARVA Agent Cellnex found. Requesting registration"}}
+{"date":"27/10/2020_18:11:59","record":{"agent":"73334940","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"27/10/2020_18:11:59","record":{"agent":"73334940","info":"Behaviour REGULAR starts"}}
+{"date":"27/10/2020_18:11:59","record":{"agent":"73334940","info":"Enviando credenciales"}}
+{"date":"27/10/2020_18:11:59","record":{"agent":"73334940","info":"Enviada petición de login"}}
+{"date":"27/10/2020_18:11:59","record":{"agent":"73334940","info":"******************************************{\"result\":\"ok\",\"key\":\"hgm8KzgH\",\"width\":100,\"height\":100,\"maxflight\":256,\"capabilities\":[\"moveF\",\"rotateL\",\"rotateR\",\"moveUP\",\"moveD\",\"touchD\",\"recharge\",\"rescue\",\"status\",\"trace\",\"alive\",\"distance\",\"altimeter\",\"gps\",\"visual\",\"angular\",\"compass\"]}"}}
+{"date":"27/10/2020_18:11:59","record":{"agent":"73334940","info":"La key almacenada es hgm8KzgH"}}
+{"date":"27/10/2020_18:11:59","record":{"agent":"73334940","info":"La clave recibida es: hgm8KzgH"}}
+{"date":"27/10/2020_18:11:59","record":{"agent":"73334940","info":"El server dice: {\"result\":\"ok\"}"}}
+{"date":"27/10/2020_18:12:14","record":{"agent":"73334940","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"hgm8KzgH\"}"}}
+{"date":"27/10/2020_18:12:15","record":{"agent":"73334940","info":"++++++++++++El server dice: {\"result\":\"error\",\"details\":\"Crash onto world's boundaries. \"}"}}

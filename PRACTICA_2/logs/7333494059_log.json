@@ -1,0 +1,21 @@
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Load configuration"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Found CardID"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"CardID: gItAiFDZFAAnIA83 which belongs to ROMAN LARROSA LEWANDOWSKA (Cellnex)"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Trying to checkin in the platform"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Chekin confirmed in the platform"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Trying to register in LARVA"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Found ASSIGNMENTID 2"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 2>"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"LARVA Agent Cellnex found. Requesting registration"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Behaviour REGULAR starts"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Enviando credenciales"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"Enviada petición de login"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"******************************************{\"result\":\"ok\",\"key\":\"3jKL4Cif\",\"width\":100,\"height\":100,\"maxflight\":256,\"capabilities\":[\"moveF\",\"rotateL\",\"rotateR\",\"moveUP\",\"moveD\",\"touchD\",\"recharge\",\"rescue\",\"status\",\"trace\",\"alive\",\"distance\",\"altimeter\",\"gps\",\"visual\",\"angular\",\"compass\"]}"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"La key almacenada es 3jKL4Cif"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"La clave recibida es: 3jKL4Cif"}}
+{"date":"27/10/2020_18:13:17","record":{"agent":"7333494059","info":"El server dice: {\"result\":\"ok\"}"}}
+{"date":"27/10/2020_18:13:24","record":{"agent":"7333494059","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"3jKL4Cif\"}"}}
+{"date":"27/10/2020_18:13:24","record":{"agent":"7333494059","info":"++++++++++++El server dice: {\"result\":\"error\",\"details\":\"Crash onto world's boundaries. \"}"}}
