@@ -10,3 +10,54 @@
 {"date":"24/10/2020_14:42:07","record":{"agent":"743849999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 2>"}}
 {"date":"24/10/2020_14:42:07","record":{"agent":"743849999","info":"LARVA Agent Cellnex found. Requesting registration"}}
 {"date":"24/10/2020_14:42:07","record":{"agent":"743849999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Load configuration"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Found CardID"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"CardID: gItAiFDZFAAnIA83 which belongs to ROMAN LARROSA LEWANDOWSKA (Cellnex)"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Trying to checkin in the platform"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Chekin confirmed in the platform"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Trying to register in LARVA"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Found ASSIGNMENTID 2"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 2>"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"LARVA Agent Cellnex found. Requesting registration"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Behaviour REGULAR starts"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Enviando credenciales"}}
+{"date":"27/10/2020_17:43:54","record":{"agent":"743849999","info":"Enviada petición de login"}}
+{"date":"27/10/2020_17:43:55","record":{"agent":"743849999","info":"******************************************{\"result\":\"ok\",\"key\":\"SYF8OEnn\",\"width\":100,\"height\":100,\"maxflight\":256,\"capabilities\":[\"moveF\",\"rotateL\",\"rotateR\",\"moveUP\",\"moveD\",\"touchD\",\"recharge\",\"rescue\",\"status\",\"trace\",\"alive\",\"distance\",\"altimeter\",\"gps\",\"visual\"]}"}}
+{"date":"27/10/2020_17:43:55","record":{"agent":"743849999","info":"La key almacenada es SYF8OEnn"}}
+{"date":"27/10/2020_17:43:55","record":{"agent":"743849999","info":"La clave recibida es: SYF8OEnn"}}
+{"date":"27/10/2020_17:43:55","record":{"agent":"743849999","info":"La lectora de sensores es: {\"result\":\"ok\",\"details\":{\"name\":\"743849999\",\"perceptions\":[{\"sensor\":\"alive\",\"data\":[1]},{\"sensor\":\"distance\",\"data\":[140.0071426749364]},{\"sensor\":\"altimeter\",\"data\":[0]},{\"sensor\":\"gps\",\"data\":[[99,99,45]]},{\"sensor\":\"visual\",\"data\":[[45,45,45,45,-2147483648,-2147483648,-2147483648],[45,45,45,45,-2147483648,-2147483648,-2147483648],[45,45,45,45,-2147483648,-2147483648,-2147483648],[45,45,45,45,-2147483648,-2147483648,-2147483648],[-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648],[-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648],[-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648]]},{\"sensor\":\"trace\",\"data\":[\"login Playground1\"]},{\"sensor\":\"status\",\"data\":[\"Fresh new\"]}]}}"}}
+{"date":"27/10/2020_17:43:56","record":{"agent":"743849999","info":"{\"result\":\"ok\",\"key\":\"SYF8OEnn\",\"width\":100,\"height\":100,\"maxflight\":256,\"capabilities\":[\"moveF\",\"rotateL\",\"rotateR\",\"moveUP\",\"moveD\",\"touchD\",\"recharge\",\"rescue\",\"status\",\"trace\",\"alive\",\"distance\",\"altimeter\",\"gps\",\"visual\"]}"}}
+{"date":"27/10/2020_17:43:56","record":{"agent":"743849999","info":"{\"command\":\"execute\",\"action\":\"rotateL\",\"key\":\"SYF8OEnn\"}"}}
+{"date":"27/10/2020_17:43:56","record":{"agent":"743849999","info":"El server dice: {\"result\":\"ok\"}"}}
+{"date":"27/10/2020_17:43:56","record":{"agent":"743849999","info":"Resultado de la accion: ok"}}
+{"date":"27/10/2020_17:43:56","record":{"agent":"743849999","info":"Execute body"}}
+{"date":"27/10/2020_17:43:56","record":{"agent":"743849999","info":"Single shutting down"}}
+{"date":"27/10/2020_17:43:56","record":{"agent":"743849999","info":"Requesting unregistration in LARVA"}}
+{"date":"27/10/2020_17:43:56","record":{"agent":"743849999","info":"Succesfully unregistered in LARVA"}}
+{"date":"27/10/2020_17:44:00","record":{"agent":"743849999","info":"Trying to checkout from the platform"}}
+{"date":"27/10/2020_17:44:00","record":{"agent":"743849999","info":"Checked-out from the platform"}}
+{"date":"27/10/2020_17:44:00","record":{"agent":"743849999","info":"Take down"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Load configuration"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Found CardID"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"CardID: gItAiFDZFAAnIA83 which belongs to ROMAN LARROSA LEWANDOWSKA (Cellnex)"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Trying to checkin in the platform"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Chekin confirmed in the platform"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Trying to register in LARVA"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Found ASSIGNMENTID 2"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 2>"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"LARVA Agent Cellnex found. Requesting registration"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Behaviour REGULAR starts"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Enviando credenciales"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"Enviada petición de login"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"******************************************{\"result\":\"ok\",\"key\":\"zvY3g5R3\",\"width\":100,\"height\":100,\"maxflight\":256,\"capabilities\":[\"moveF\",\"rotateL\",\"rotateR\",\"moveUP\",\"moveD\",\"touchD\",\"recharge\",\"rescue\",\"status\",\"trace\",\"alive\",\"distance\",\"altimeter\",\"gps\",\"visual\"]}"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"La key almacenada es zvY3g5R3"}}
+{"date":"27/10/2020_17:49:32","record":{"agent":"743849999","info":"La clave recibida es: zvY3g5R3"}}
+{"date":"27/10/2020_17:49:33","record":{"agent":"743849999","info":"El server dice: {\"result\":\"ok\"}"}}
+{"date":"27/10/2020_17:49:33","record":{"agent":"743849999","info":"La lectora de sensores es: {\"result\":\"ok\",\"details\":{\"name\":\"743849999\",\"perceptions\":[{\"sensor\":\"alive\",\"data\":[1]},{\"sensor\":\"distance\",\"data\":[140.0071426749364]},{\"sensor\":\"altimeter\",\"data\":[0]},{\"sensor\":\"gps\",\"data\":[[99,99,45]]},{\"sensor\":\"visual\",\"data\":[[45,45,45,45,-2147483648,-2147483648,-2147483648],[45,45,45,45,-2147483648,-2147483648,-2147483648],[45,45,45,45,-2147483648,-2147483648,-2147483648],[45,45,45,45,-2147483648,-2147483648,-2147483648],[-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648],[-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648],[-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648]]},{\"sensor\":\"trace\",\"data\":[\"login Playground1\",\"rotateL\"]},{\"sensor\":\"status\",\"data\":[\"\"]}]}}"}}
+{"date":"27/10/2020_17:49:39","record":{"agent":"743849999","info":"La lectora de sensores es: {\"result\":\"ok\",\"details\":{\"name\":\"743849999\",\"perceptions\":[{\"sensor\":\"alive\",\"data\":[0]},{\"sensor\":\"distance\",\"data\":[140.0142849854971]},{\"sensor\":\"altimeter\",\"data\":[-2147483648]},{\"sensor\":\"gps\",\"data\":[[100,98,45]]},{\"sensor\":\"visual\",\"data\":[[45,45,45,-2147483648,-2147483648,-2147483648,-2147483648],[45,45,45,-2147483648,-2147483648,-2147483648,-2147483648],[45,45,45,-2147483648,-2147483648,-2147483648,-2147483648],[45,45,45,-2147483648,-2147483648,-2147483648,-2147483648],[45,45,45,-2147483648,-2147483648,-2147483648,-2147483648],[-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648],[-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648,-2147483648]]},{\"sensor\":\"trace\",\"data\":[\"login Playground1\",\"rotateL\",\"moveF\"]},{\"sensor\":\"status\",\"data\":[\"Crash onto world's boundaries. \"]}]}}"}}

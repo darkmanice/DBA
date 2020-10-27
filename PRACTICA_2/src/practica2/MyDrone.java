@@ -9,6 +9,8 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MyDrone extends IntegratedAgent {
     
@@ -37,7 +39,7 @@ public class MyDrone extends IntegratedAgent {
         ACLMessage out = new ACLMessage();
         
         //Decision de los sensores con los que se loguea en el mundo
-        String attach[] = {"alive", "distance", "altimeter"};
+        String attach[] = {"alive", "distance", "altimeter", "gps", "visual"};
         
         //Iniciar sesion en el mundo
         ACLMessage in = login(out, "Playground1", attach);
@@ -62,10 +64,10 @@ public class MyDrone extends IntegratedAgent {
         }
         
         //Lectura de sensores
-        json = readSensores(out, in);
         
-        Info(answer);
+        //PRUEBA PARA QUE EL DRONE SE MUEVA
         
+        //GIRO A LA IZQUIERDA
         //CREAMOS LA ACCION
         String command2 = "execute";
         String accion = "rotateL";
@@ -76,32 +78,50 @@ public class MyDrone extends IntegratedAgent {
         json.add("key", key);
         String resultado = json.toString();
         
-        
         //ENVIAMOS LA ACCION
         out.setContent(resultado);
         this.send(out);
-        
-        Info(resultado);
         
         //ESPERAMOS RESPUESTA
         in = this.blockingReceive();
         answer = in.getContent();
         Info("El server dice: " + answer);
         
-        json  = Json.parse(answer).asObject();
-        String result = json.get("result").asString();
-        
-        Info("Resultado de la accion: " + result);
-        
-        if(result == "ok"){
-            logout(out);
+        for(int i=0; i<200; i++){
+            try {
+                //leemos sensores
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MyDrone.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            json = readSensores(out, in);
+            //Info(answer);
+            
+            //Vamos hacia delante
+            json = new JsonObject();
+            json.add("command", "execute");
+            json.add("action", "moveF");
+            json.add("key", key);
+            resultado = json.toString();
+
+            //ENVIAMOS LA ACCION
+            out.setContent(resultado);
+            this.send(out);
+
+            //ESPERAMOS RESPUESTA
+            in = this.blockingReceive();
+            answer = in.getContent();
+            //Info("El server dice: " + answer);
         }
+
+        logout(out);
+       
         _exitRequested = true;
     }
     
     @Override
     public void takeDown() {
-        myControlPanel.close();
         this.doCheckoutLARVA();
         this.doCheckoutPlatform();
         super.takeDown();
@@ -116,6 +136,7 @@ public class MyDrone extends IntegratedAgent {
         
         Info("Sesion cerrada"); 
         this.send(out);
+        myControlPanel.close();
     }
 
     private ACLMessage login (ACLMessage out, String mundo, String sensores[]) {
@@ -158,6 +179,7 @@ public class MyDrone extends IntegratedAgent {
         height = json.get("height").asInt();
         maxflight = json.get("maxflight").asInt();
         myControlPanel.feedData(in, width, height, maxflight);
+        //myControlPanel.fancyShow();
         return in;
     }
     
@@ -177,7 +199,7 @@ public class MyDrone extends IntegratedAgent {
         Info("La lectora de sensores es: " + answer);
         
         myControlPanel.feedData(in, width, height, maxflight);
-        //myControlPanel.fancyShow();
+        
         
         //Actualizacion de los sensores 
         for (JsonValue j: json.get("details").asObject().get("perceptions").asArray()){
