@@ -1,0 +1,74 @@
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Load configuration"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Found CardID"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"CardID: gItAiFDZFAAnIA83 which belongs to ROMAN LARROSA LEWANDOWSKA (Cellnex)"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Single behaviour agent. Adding plainBehaviour."}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Trying to checkin in the platform"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Requesting checkin to AgentIdentityManager"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Chekin confirmed in the platform"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Trying to register in LARVA"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Found ASSIGNMENTID 2"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Retrieving the name of the corresponding LARVA agent for service <Analytics ASSIGNMENTID 2>"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"LARVA Agent Cellnex found. Requesting registration"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"\u001b[38;2;0;0;255mSuccesfully registered in LARVA"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Behaviour REGULAR starts"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Enviando credenciales"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"Enviada petición de login"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"******************************************{\"result\":\"ok\",\"key\":\"QVKRgXnf\",\"width\":100,\"height\":100,\"maxflight\":256,\"capabilities\":[\"moveF\",\"rotateL\",\"rotateR\",\"moveUP\",\"moveD\",\"touchD\",\"recharge\",\"rescue\",\"status\",\"trace\",\"alive\",\"distance\",\"altimeter\",\"gps\",\"visual\",\"angular\",\"compass\"]}"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"La key almacenada es QVKRgXnf"}}
+{"date":"28/10/2020_11:55:29","record":{"agent":"7333499405999889999","info":"La clave recibida es: QVKRgXnf"}}
+{"date":"28/10/2020_11:55:30","record":{"agent":"7333499405999889999","info":"El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:55:31","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:55:54","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:55:54","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:55:54","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:55:56","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:55:56","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:55:56","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:55:58","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:55:58","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:55:58","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:56:01","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:56:01","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:56:01","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:56:03","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:56:03","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:56:03","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:56:05","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:56:05","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:56:05","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:56:07","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:56:07","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:56:07","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:56:09","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:56:09","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:56:09","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:56:11","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:56:11","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:56:12","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:56:14","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:56:14","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:56:14","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:56:16","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:56:16","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:56:16","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:56:18","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:56:18","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:56:18","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_11:56:20","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_11:56:20","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_11:56:20","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_12:05:39","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_12:05:39","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_12:05:39","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_12:05:42","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_12:05:42","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_12:05:42","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_12:05:44","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_12:05:44","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_12:05:44","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_12:05:46","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_12:05:46","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_12:05:46","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
+{"date":"28/10/2020_12:05:48","record":{"agent":"7333499405999889999","info":"********{\"command\":\"execute\",\"action\":\"moveF\",\"key\":\"QVKRgXnf\"}"}}
+{"date":"28/10/2020_12:05:48","record":{"agent":"7333499405999889999","info":"++++++++++++El server dice: {\"result\":\"ok\"}"}}
+{"date":"28/10/2020_12:05:48","record":{"agent":"7333499405999889999","info":"El drone esta vivo??1"}}
