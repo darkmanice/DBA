@@ -265,7 +265,45 @@ public class MyDrone extends IntegratedAgent {
         ArrayList<String> casillas = new ArrayList<>();
         ArrayList<Double> distancias = new ArrayList<>();
 
-        casillas.add("NO");
+        diferenciaDistancias(casillas, distancias);
+        
+        burbuja(casillas, distancias);
+
+        
+        //En orden, mirar que se pueda ir a la siguiente casilla
+        
+
+        return acciones;
+    }
+    
+    private void burbuja(ArrayList<String> casillas, ArrayList<Double> distancias){
+        //Ordenamos por orden de distancias
+        int i;
+        boolean flag = true;
+        double temp;
+        String temps;
+
+        while (flag) {
+            flag = false;
+            for (i = 0; i < distancias.size() - 1; i++) {
+                if (distancias.get(i) > distancias.get(i + 1)) {
+                    temp = distancias.get(i);
+                    temps = casillas.get(i);
+                    
+                    distancias.set(i, distancias.get(i+1));
+                    distancias.set(i+1, temp);
+                    
+                    casillas.set(i, casillas.get(i+1));
+                    casillas.set(i+1, temps);
+
+                    flag = true;
+                }
+            }
+        }
+    }
+    
+    private void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
+                casillas.add("NO");
         if(memoria[position[0]-1][position[1]+1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
         }else {
@@ -320,35 +358,5 @@ public class MyDrone extends IntegratedAgent {
         }else {
             distancias.add(Math.abs((double) angular - (-90)));
         }
-        
-
-        //Ordenamos por orden de distancias
-        int i;
-        boolean flag = true;
-        double temp;
-        String temps;
-
-        while (flag) {
-            flag = false;
-            for (i = 0; i < distancias.size() - 1; i++) {
-                if (distancias.get(i) > distancias.get(i + 1)) {
-                    temp = distancias.get(i);
-                    temps = casillas.get(i);
-                    
-                    distancias.set(i, distancias.get(i+1));
-                    distancias.set(i+1, temp);
-                    
-                    casillas.set(i, casillas.get(i+1));
-                    casillas.set(i+1, temps);
-
-                    flag = true;
-                }
-            }
-        }
-        
-        //En orden, mirar que se pueda ir a la siguiente casilla
-        
-
-        return acciones;
     }
 }
