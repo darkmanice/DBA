@@ -332,6 +332,8 @@ public class MyDrone extends IntegratedAgent {
     }
     
     private void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
+        //TODO meter solo las casillas disponibles: cuando este en los bordes que no lo haga
+        //if position[0] > 0 && position[1] > 0
         casillas.add("NO");
         if(memoria[position[0]-1][position[1]-1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
@@ -339,6 +341,7 @@ public class MyDrone extends IntegratedAgent {
             distancias.add(Math.abs((double) angular - (-45)));
         }
         
+        //if position[1] > 0
         casillas.add("N");
         if(memoria[position[0]][position[1]-1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
@@ -346,6 +349,7 @@ public class MyDrone extends IntegratedAgent {
             distancias.add(Math.abs((double) angular));
         }
         
+        //if position[1] > 0 && position[0] < (width - 1)
         casillas.add("NE");
         if(memoria[position[0]+1][position[1]-1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
@@ -353,6 +357,7 @@ public class MyDrone extends IntegratedAgent {
            distancias.add(Math.abs((double) angular - (45)));
         }
        
+        //if position[0] < (width - 1)
         casillas.add("E");
         if(memoria[position[0]+1][position[1]] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
@@ -360,6 +365,7 @@ public class MyDrone extends IntegratedAgent {
             distancias.add(Math.abs((double) angular - (90)));
         }
         
+        //if position[0] < (width - 1) && position[1] < (width - 1)
         casillas.add("SE");
         if(memoria[position[0]+1][position[1]+1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
@@ -367,6 +373,7 @@ public class MyDrone extends IntegratedAgent {
             distancias.add(Math.abs((double) angular - (135)));
         }
         
+        //if position[1] < (width - 1)
         casillas.add("S");
         if(memoria[position[0]][position[1]+1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
@@ -374,6 +381,7 @@ public class MyDrone extends IntegratedAgent {
             distancias.add(Math.abs((double) angular - (180)));
         }
         
+        //if position[1] < (width - 1) && position[0] > 0
         casillas.add("SO");
         if(memoria[position[0]-1][position[1]+1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
@@ -381,6 +389,7 @@ public class MyDrone extends IntegratedAgent {
             distancias.add(Math.abs((double) angular - (-135)));
         }
         
+        //if position[0] > 0
         casillas.add("O");
         if(memoria[position[0]-1][position[1]] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
