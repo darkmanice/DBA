@@ -11,6 +11,9 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MyDrone extends IntegratedAgent {
 
@@ -21,8 +24,8 @@ public class MyDrone extends IntegratedAgent {
 
     private int mundo[][];  //Se inicializa con width x width a 0
     private int memoria[][]; //Se inicializa con width x width 0, 1 si ya hemos pasado
-    private int position[]; //Posicion del drone
-    private int lidar[][];
+    private int position[] = new int[3]; //Posicion del drone
+    private int lidar[][] = new int[7][7];
     private double thermal[][];
 
     private int compass = -90;
@@ -53,7 +56,7 @@ public class MyDrone extends IntegratedAgent {
         ACLMessage out = new ACLMessage();
 
         //Decision de los sensores con los que se loguea en el mundo
-        String attach[] = {"alive", "distance", "altimeter", "gps", "visual", "angular", "compass"};
+        String attach[] = {"alive", "distance", "altimeter", "gps", "visual", "angular", "compass", "energy"};
 
         //Iniciar sesion en el mundo
         ACLMessage in = login(out, "Playground1", attach);
@@ -88,6 +91,10 @@ public class MyDrone extends IntegratedAgent {
                 //ESPERAMOS RESPUESTA
                 in = this.blockingReceive();
                 answer = in.getContent();
+                //if(
+                
+                if(Json.parse(answer).asObject().get("result").asString().equals("error"))
+                    Info(answer);
             }
         }
 
@@ -143,16 +150,23 @@ public class MyDrone extends IntegratedAgent {
 
         //ESPERAMOS RESPUESTA
         ACLMessage in = this.blockingReceive();
-        Info("******************************************" + in.getContent());
 
         json = Json.parse(in.getContent()).asObject();
         key = json.get("key").asString();
 
-        Info("La key almacenada es " + key);
+        
         width = json.get("width").asInt();
         height = json.get("height").asInt();
         maxflight = json.get("maxflight").asInt();
+        
+        Info("La key almacenada es " + key);
         myControlPanel.feedData(in, width, height, maxflight);
+        
+        
+        
+        memoria = new int[width+2][width+2];
+        this.mundo = new int[width+2][width+2];
+        thermal = new double[width+2][width+2];
 
         //Inicializar las matrices
         for (int i = 0; i < width+1; i++) {
@@ -196,11 +210,12 @@ public class MyDrone extends IntegratedAgent {
                     angular = j.asObject().get("data").asArray().get(0).asDouble();
                     break;
                 case ("gps"):
-                    position[0] = j.asObject().get("data").asArray().get(0).asInt();
-                    position[1] = j.asObject().get("data").asArray().get(1).asInt();
-                    position[2] = j.asObject().get("data").asArray().get(2).asInt();
+                    position[0] = j.asObject().get("data").asArray().get(0).asArray().get(0).asInt();
+                    position[1] = j.asObject().get("data").asArray().get(0).asArray().get(1).asInt();
+                    position[2] = j.asObject().get("data").asArray().get(0).asArray().get(2).asInt();
                     memoria[position[0]][position[1]] = 1;
                     break;
+
                 case ("ontarget"):
                     ontarget = j.asObject().get("data").asArray().get(0).asInt();
                     break;
@@ -209,6 +224,9 @@ public class MyDrone extends IntegratedAgent {
                     break;
                 case ("distance"):
                     distance = j.asObject().get("data").asArray().get(0).asDouble();
+                    break;
+                case ("energy"):
+                    energy = j.asObject().get("data").asArray().get(0).asInt();
                     break;
                 case ("altimeter"):
                     altimeter = j.asObject().get("data").asArray().get(0).asInt();
@@ -247,19 +265,6 @@ public class MyDrone extends IntegratedAgent {
 
     private ArrayList<String> calcularAccion() {
         ArrayList acciones = new ArrayList<String>();
-        //Mirar si hay que recarga batería (Si tiene menos de 50)
-        if (energy < energy_u) {
-            //Bajar hasta altimetro = 5
-            for (int i = 0; i < altimeter / 5 - 1; i++) {
-                acciones.add("moveD");
-            }
-            //Aterrizar (touchD)
-            acciones.add("touchD");
-            //recharge
-            acciones.add("recharge");
-            //muveUP
-            acciones.add("moveUP");
-        }
 
         //Hacia donde ir
         ArrayList<String> casillas = new ArrayList<>();
@@ -272,6 +277,28 @@ public class MyDrone extends IntegratedAgent {
         
         //En orden, mirar que se pueda ir a la siguiente casilla
         
+        //Mirar si hay que recarga batería antes de realizar las acciones
+        Info("Coste: " + coste(acciones));
+        Info("Queda energia: " + energy);
+        
+        if (energy_u > (energy - coste(acciones))) {
+            ArrayList<String> bajar = new ArrayList<>();
+            //Bajar hasta altimetro = 5
+            Info("El altimetro: " + altimeter);
+            Info("Bajamos " + altimeter/5 + " veces");
+            for (int i = 0; i < altimeter/5; i++) {
+                Info("**");
+                bajar.add("moveD");
+            }
+            //Aterrizar (touchD)
+            bajar.add("touchD");
+            //recharge
+            bajar.add("recharge");
+            //muveUP
+            bajar.add("moveUP");
+            
+            return bajar;
+        }
 
         return acciones;
     }
@@ -303,7 +330,7 @@ public class MyDrone extends IntegratedAgent {
     }
     
     private void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
-                casillas.add("NO");
+        casillas.add("NO");
         if(memoria[position[0]-1][position[1]+1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
         }else {
@@ -358,5 +385,34 @@ public class MyDrone extends IntegratedAgent {
         }else {
             distancias.add(Math.abs((double) angular - (-90)));
         }
+    }
+    
+    private int coste(ArrayList<String> acciones){
+        int coste = 0;
+        
+        for(int i=0; i<acciones.size(); i++){
+            switch(acciones.get(i)){
+                case "moveF":
+                    coste += 1;
+                    break;
+                case "rotateL":
+                    coste += 1;
+                    break;
+                case "rotateR":
+                    coste += 1;
+                    break;
+                case "moveUP":
+                    coste += 5;
+                    break;
+                case "moveD":
+                    coste += 5;
+                    break;
+                case "touchD":
+                    coste += 5;
+                    break;
+            }
+        }
+        
+        return coste;
     }
 }
