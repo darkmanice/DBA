@@ -3,6 +3,7 @@ SAMPLE.cardID
 /PRACTICA_1/dist/
 *.log
 *.lock
+*log.json
 /PRACTICA_2/build/
 /PRACTICA_2/dist/
 PRACTICA_2/logs/74384999_log.json
