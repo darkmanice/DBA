@@ -36,6 +36,8 @@ public class MyDrone extends IntegratedAgent {
     private double distance;
     private int altimeter;
     private int energy;
+    
+    private int nSensores;  //Numero de sensores añadidos al drone
 
     private int energy_u = 50; //Umbral para recargar la batería
 
@@ -57,6 +59,7 @@ public class MyDrone extends IntegratedAgent {
 
         //Decision de los sensores con los que se loguea en el mundo
         String attach[] = {"alive", "distance", "altimeter", "gps", "visual", "angular", "compass", "energy"};
+        nSensores = attach.length;
 
         //Iniciar sesion en el mundo
         ACLMessage in = login(out, "Playground1", attach);
@@ -239,7 +242,8 @@ public class MyDrone extends IntegratedAgent {
             if (j.asObject().get("sensor").asString() == "visual") {
                 for (int i = 0; i < 7; i++) {
                     for (int k = 0; k < 7; k++) {
-                        mundo[position[0] + 3 - i][position[1] + 3 - k] = j.asObject().get("data").asArray().get(i).asArray().get(k).asInt();
+                        if((position[0] - 3 + i)>=0 && (position[1] - 3 + k) >= 0)
+                        mundo[position[0] - 3 + i][position[1] - 3 + k] = j.asObject().get("data").asArray().get(i).asArray().get(k).asInt();
                     }
                 }
             }
@@ -247,7 +251,8 @@ public class MyDrone extends IntegratedAgent {
             if (j.asObject().get("sensor").asString() == "lidar") {
                 for (int i = 0; i < 7; i++) {
                     for (int k = 0; k < 7; k++) {
-                        lidar[position[0] + 3 - i][position[1] + 3 - k] = j.asObject().get("data").asArray().get(i).asArray().get(k).asInt();
+                        if((position[0] - 3 + i)>=0 && (position[1] - 3 + k) >= 0)
+                        lidar[position[0] - 3 + i][position[1] - 3 + k] = j.asObject().get("data").asArray().get(i).asArray().get(k).asInt();
                     }
                 }
             }
@@ -255,7 +260,8 @@ public class MyDrone extends IntegratedAgent {
             if (j.asObject().get("sensor").asString() == "thermal") {
                 for (int i = 0; i < 7; i++) {
                     for (int k = 0; k < 7; k++) {
-                        thermal[position[0] + 3 - i][position[1] + 3 - k] = j.asObject().get("data").asArray().get(i).asArray().get(k).asDouble();
+                        if((position[0] - 3 + i)>=0 && (position[1] - 3 + k) >= 0)
+                        thermal[position[0] - 3 + i][position[1] - 3 + k] = j.asObject().get("data").asArray().get(i).asArray().get(k).asDouble();
                     }
                 }
             }
@@ -330,6 +336,7 @@ public class MyDrone extends IntegratedAgent {
     }
     
     private void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
+        //TODO Tener en cuenta que el [0,0] es la esquina superior
         casillas.add("NO");
         if(memoria[position[0]-1][position[1]+1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
@@ -388,7 +395,7 @@ public class MyDrone extends IntegratedAgent {
     }
     
     private int coste(ArrayList<String> acciones){
-        int coste = 0;
+        int coste = nSensores;
         
         for(int i=0; i<acciones.size(); i++){
             switch(acciones.get(i)){
