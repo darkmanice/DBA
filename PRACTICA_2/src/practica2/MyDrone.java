@@ -10,10 +10,6 @@ import com.eclipsesource.json.JsonValue;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MyDrone extends IntegratedAgent {
 
@@ -336,23 +332,22 @@ public class MyDrone extends IntegratedAgent {
     }
     
     private void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
-        //TODO Tener en cuenta que el [0,0] es la esquina superior
         casillas.add("NO");
-        if(memoria[position[0]-1][position[1]+1] == 1){
+        if(memoria[position[0]-1][position[1]-1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
         }else {
             distancias.add(Math.abs((double) angular - (-45)));
         }
         
         casillas.add("N");
-        if(memoria[position[0]][position[1]+1] == 1){
+        if(memoria[position[0]][position[1]-1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
         }else {
             distancias.add(Math.abs((double) angular));
         }
         
         casillas.add("NE");
-        if(memoria[position[0]+1][position[1]+1] == 1){
+        if(memoria[position[0]+1][position[1]-1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
         }else {
            distancias.add(Math.abs((double) angular - (45)));
@@ -366,21 +361,21 @@ public class MyDrone extends IntegratedAgent {
         }
         
         casillas.add("SE");
-        if(memoria[position[0]+1][position[1]-1] == 1){
+        if(memoria[position[0]+1][position[1]+1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
         }else {
             distancias.add(Math.abs((double) angular - (135)));
         }
         
         casillas.add("S");
-        if(memoria[position[0]][position[1]-1] == 1){
+        if(memoria[position[0]][position[1]+1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
         }else {
             distancias.add(Math.abs((double) angular - (180)));
         }
         
         casillas.add("SO");
-        if(memoria[position[0]-1][position[1]-1] == 1){
+        if(memoria[position[0]-1][position[1]+1] == 1){
             distancias.add(Double.POSITIVE_INFINITY);
         }else {
             distancias.add(Math.abs((double) angular - (-135)));
