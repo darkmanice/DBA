@@ -10,6 +10,9 @@ import com.eclipsesource.json.JsonValue;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MyDrone extends IntegratedAgent {
 
@@ -59,7 +62,7 @@ public class MyDrone extends IntegratedAgent {
         nSensores = attach.length;
 
         //Iniciar sesion en el mundo
-        ACLMessage in = login(out, "Playground2", attach);
+        ACLMessage in = login(out, "World5", attach);
 
         String answer = in.getContent();
         out = in.createReply();
@@ -71,10 +74,17 @@ public class MyDrone extends IntegratedAgent {
             details = json.get("details").asString();
             Info("Detalles del error: " + details);
         }
-
+        
         while (!rescatado) {
             //Lecutra de sensores
             readSensores(out, in);
+            //muestra el mundo
+//            for(int i = 0; i < width; i++){
+//               for(int j = 0; j < width; j++){
+//                   System.out.print(mundo[i][j] + " ");
+//               } 
+//               System.out.println("");
+//            }
             ArrayList<String> acciones = calcularAccion();
             
             for (String accion : acciones) {
@@ -86,6 +96,14 @@ public class MyDrone extends IntegratedAgent {
 
                 //Enviar la accion
                 out.setContent(resultado);
+                
+//                try {
+//                    Thread.sleep(3000);
+//                } catch (InterruptedException ex) {
+//                    Logger.getLogger(MyDrone.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+                              
+                
                 this.send(out);
 
                 //ESPERAMOS RESPUESTA
@@ -164,9 +182,9 @@ public class MyDrone extends IntegratedAgent {
         
         
         
-        memoria = new int[width+2][width+2];
-        this.mundo = new int[width+2][width+2];
-        thermal = new double[width+2][width+2];
+        memoria = new int[width+4][width+4];
+        this.mundo = new int[width+4][width+4];
+        thermal = new double[width+4][width+4];
 
         //Inicializar las matrices
         for (int i = 0; i < width+1; i++) {
@@ -190,6 +208,7 @@ public class MyDrone extends IntegratedAgent {
 
         in = this.blockingReceive();
         String answer = in.getContent();
+        Info(answer);
         json = Json.parse(answer).asObject();
         out = in.createReply();
 
@@ -236,7 +255,7 @@ public class MyDrone extends IntegratedAgent {
 
         //Rellenar mundo, lidar y thermal tras leer el resto de sonsores
         for (JsonValue j : json.get("details").asObject().get("perceptions").asArray()) {
-            if (j.asObject().get("sensor").asString() == "visual") {
+            if (j.asObject().get("sensor").asString().equals("visual")) {
                 for (int i = 0; i < 7; i++) {
                     for (int k = 0; k < 7; k++) {
                         if((position[0] - 3 + i)>=0 && (position[1] - 3 + k) >= 0)
@@ -245,7 +264,7 @@ public class MyDrone extends IntegratedAgent {
                 }
             }
 
-            if (j.asObject().get("sensor").asString() == "lidar") {
+            if (j.asObject().get("sensor").asString().equals("lidar")) {
                 for (int i = 0; i < 7; i++) {
                     for (int k = 0; k < 7; k++) {
                         if((position[0] - 3 + i)>=0 && (position[1] - 3 + k) >= 0)
@@ -254,7 +273,7 @@ public class MyDrone extends IntegratedAgent {
                 }
             }
 
-            if (j.asObject().get("sensor").asString() == "thermal") {
+            if (j.asObject().get("sensor").asString().equals("thermal")) {
                 for (int i = 0; i < 7; i++) {
                     for (int k = 0; k < 7; k++) {
                         if((position[0] - 3 + i)>=0 && (position[1] - 3 + k) >= 0)
@@ -264,8 +283,53 @@ public class MyDrone extends IntegratedAgent {
             }
 
         }
+        
+        //Info("Casilla SUR, altura: " + mundo[position[0]+1][position[1]]);
+        
     }
 
+    private ArrayList<String> calculaGiroySubida(double angulo, int altura){
+        ArrayList<String> acciones = new ArrayList<>();
+        int anguloCasilla;
+        double direccionGiro;
+        int ngiros;
+        int diferenciaAltura;
+        //calcular cuanto tiene que girar
+                direccionGiro = Math.abs((angulo+360)%360 - (compass+360)%360);
+                ngiros = (int) Math.abs((angulo - compass) / 45);
+                for(int i = 0; i < ngiros; i++){
+                    if(direccionGiro >= 180){
+                        acciones.add("rotateL");
+                    }
+                    else {
+                        acciones.add("rotateR");
+                    }
+                }
+                
+                //Mirar la altura de la casilla
+                Info("Altura: " + altura);
+                diferenciaAltura = position[2] - (altura + 5);
+                if( Math.abs(diferenciaAltura/5) == 0){
+                    acciones.add("moveF");
+                }
+                for(int i = 0; i < Math.abs(diferenciaAltura/5); i++){
+                    if(diferenciaAltura >= 0){
+                        //Baja
+                        if(i == 0)
+                            acciones.add("moveF");
+                        acciones.add("moveD");
+                    } else {
+                        //Sube 
+                        acciones.add("moveUP");
+                        if(i == (diferenciaAltura/5 - 1))
+                            acciones.add("moveF");
+                    }
+                }
+                
+        
+        return acciones;
+    }
+    
     private ArrayList<String> calcularAccion() {
         ArrayList acciones = new ArrayList<String>();
 
@@ -277,7 +341,8 @@ public class MyDrone extends IntegratedAgent {
         
         burbuja(casillas, distancias);
         //Miramos si estamos encima del objetivo
-        if (ontarget == 1){
+        if (distance == 0){
+            Info("Target encontrado ****************");
             //Bajamos a rescatarlo
             ArrayList<String> bajar = new ArrayList<>();
             //Bajar hasta altimetro = 5
@@ -305,209 +370,46 @@ public class MyDrone extends IntegratedAgent {
         switch(casilla){
             case "NO":
                 anguloCasilla = -45;
-                //calcular cuanto tiene que girar
-                direccionGiro = Math.abs(anguloCasilla - compass);
-                ngiros = Math.abs((anguloCasilla - compass) / 45);
-                for(int i = 0; i < ngiros; i++){
-                    if(direccionGiro <= 180){
-                        acciones.add("rotateL");
-                    }
-                    else {
-                        acciones.add("rotateR");
-                    }
-                }
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla, mundo[position[0]-1][position[1]-1]);
                 
-                //Mirar la altura de la casilla
-                diferenciaAltura = altimeter - mundo[position[0]-1][position[1]-1];
-                for(int i = 0; i < diferenciaAltura/5; i++){
-                    if(diferenciaAltura >= 0){
-                        //Baja
-                        acciones.add("moveD");
-                    } else {
-                        //Sube 
-                        acciones.add("moveUP");
-                    }
-                }
-                    
                 break;
             case "N":
                 anguloCasilla = 0;
-                //calcular cuanto tiene que girar
-                direccionGiro = Math.abs(anguloCasilla - compass);
-                ngiros = Math.abs((anguloCasilla - compass) / 45);
-                for(int i = 0; i < ngiros; i++){
-                    if(direccionGiro <= 180){
-                        acciones.add("rotateL");
-                    }
-                    else {
-                        acciones.add("rotateR");
-                    }
-                }
-                 //Mirar la altura de la casilla
-                diferenciaAltura = altimeter - mundo[position[0]][position[1]-1];
-                for(int i = 0; i < diferenciaAltura/5; i++){
-                    if(diferenciaAltura >= 0){
-                        //Baja
-                        acciones.add("moveD");
-                    } else {
-                        //Sube 
-                        acciones.add("moveUP");
-                    }
-                }
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla, mundo[position[0]-1][position[1]]);
                 break;
             case "NE":
                 anguloCasilla = 45;
-                //calcular cuanto tiene que girar
-                direccionGiro = Math.abs(anguloCasilla - compass);
-                ngiros = Math.abs((anguloCasilla - compass) / 45);
-                for(int i = 0; i < ngiros; i++){
-                    if(direccionGiro <= 180){
-                        acciones.add("rotateL");
-                    }
-                    else {
-                        acciones.add("rotateR");
-                    }
-                }
-                 //Mirar la altura de la casilla
-                diferenciaAltura = altimeter - mundo[position[0]+1][position[1]-1];
-                for(int i = 0; i < diferenciaAltura/5; i++){
-                    if(diferenciaAltura >= 0){
-                        //Baja
-                        acciones.add("moveD");
-                    } else {
-                        //Sube 
-                        acciones.add("moveUP");
-                    }
-                }
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla, mundo[position[0]+1][position[1]-1]);
                 break;
             case "E":
                 anguloCasilla = 90;
-                //calcular cuanto tiene que girar
-                direccionGiro = Math.abs(anguloCasilla - compass);
-                ngiros = Math.abs((anguloCasilla - compass) / 45);
-                for(int i = 0; i < ngiros; i++){
-                    if(direccionGiro <= 180){
-                        acciones.add("rotateL");
-                    }
-                    else {
-                        acciones.add("rotateR");
-                    }
-                }
-                 //Mirar la altura de la casilla
-                diferenciaAltura = altimeter - mundo[position[0]+1][position[1]];
-                for(int i = 0; i < diferenciaAltura/5; i++){
-                    if(diferenciaAltura >= 0){
-                        //Baja
-                        acciones.add("moveD");
-                    } else {
-                        //Sube 
-                        acciones.add("moveUP");
-                    }
-                }
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla, mundo[position[0]][position[1]+1]);
                 break;
             case "SE":
                 anguloCasilla = 135;
-                //calcular cuanto tiene que girar
-                direccionGiro = Math.abs(anguloCasilla - compass);
-                ngiros = Math.abs((anguloCasilla - compass) / 45);
-                for(int i = 0; i < ngiros; i++){
-                    if(direccionGiro <= 180){
-                        acciones.add("rotateL");
-                    }
-                    else {
-                        acciones.add("rotateR");
-                    }
-                }
-                 //Mirar la altura de la casilla
-                diferenciaAltura = altimeter - mundo[position[0]+1][position[1]+1];
-                for(int i = 0; i < diferenciaAltura/5; i++){
-                    if(diferenciaAltura >= 0){
-                        //Baja
-                        acciones.add("moveD");
-                    } else {
-                        //Sube 
-                        acciones.add("moveUP");
-                    }
-                }
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla, mundo[position[0]+1][position[1]+1]);
                 break;
             case "S":
                 anguloCasilla = 180;
-                //calcular cuanto tiene que girar
-                direccionGiro = Math.abs(anguloCasilla - compass);
-                ngiros = Math.abs((anguloCasilla - compass) / 45);
-                for(int i = 0; i < ngiros; i++){
-                    if(direccionGiro <= 180){
-                        acciones.add("rotateL");
-                    }
-                    else {
-                        acciones.add("rotateR");
-                    }
-                }
-                 //Mirar la altura de la casilla
-                diferenciaAltura = altimeter - mundo[position[0]][position[1]+1];
-                for(int i = 0; i < diferenciaAltura/5; i++){
-                    if(diferenciaAltura >= 0){
-                        //Baja
-                        acciones.add("moveD");
-                    } else {
-                        //Sube 
-                        acciones.add("moveUP");
-                    }
-                }
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla, mundo[position[0]+1][position[1]]);
                 break;
             case "SO":
                 anguloCasilla = -135;
-                //calcular cuanto tiene que girar
-                direccionGiro = Math.abs(anguloCasilla - compass);
-                ngiros = Math.abs((anguloCasilla - compass) / 45);
-                for(int i = 0; i < ngiros; i++){
-                    if(direccionGiro <= 180){
-                        acciones.add("rotateL");
-                    }
-                    else {
-                        acciones.add("rotateR");
-                    }
-                }
-                 //Mirar la altura de la casilla
-                diferenciaAltura = altimeter - mundo[position[0]-1][position[1]+1];
-                for(int i = 0; i < diferenciaAltura/5; i++){
-                    if(diferenciaAltura >= 0){
-                        //Baja
-                        acciones.add("moveD");
-                    } else {
-                        //Sube 
-                        acciones.add("moveUP");
-                    }
-                }
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla, mundo[position[0]-1][position[1]+1]);
                 break;
             case "O":
                 anguloCasilla = -90;
-                //calcular cuanto tiene que girar
-                direccionGiro = Math.abs(anguloCasilla - compass);
-                ngiros = Math.abs((anguloCasilla - compass) / 45);
-                for(int i = 0; i < ngiros; i++){
-                    if(direccionGiro <= 180){
-                        acciones.add("rotateL");
-                    }
-                    else {
-                        acciones.add("rotateR");
-                    }
-                }
-                 //Mirar la altura de la casilla
-                diferenciaAltura = altimeter - mundo[position[0]-1][position[1]];
-                for(int i = 0; i < diferenciaAltura/5; i++){
-                    if(diferenciaAltura >= 0){
-                        //Baja
-                        acciones.add("moveD");
-                    } else {
-                        //Sube 
-                        acciones.add("moveUP");
-                    }
-                }
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla, mundo[position[0]][position[1]-1]);
                 break;
         }
-        //Ir hacia delante
-        acciones.add("moveF");
         
         //Mirar si hay que recarga batería antes de realizar las acciones
         Info("Coste: " + coste(acciones));
@@ -530,6 +432,7 @@ public class MyDrone extends IntegratedAgent {
             //Aterrizar (touchD)
             bajar.add("touchD");
             //recharge
+            Info("Recarga bateria");
             bajar.add("recharge");
             //muveUP
             bajar.add("moveUP");
