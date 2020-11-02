@@ -36,6 +36,7 @@ public class MyDrone extends IntegratedAgent {
     private int nSensores;  //Numero de sensores añadidos al drone
 
     private int energy_u = 50; //Umbral para recargar la batería
+    private boolean rescatado = false;
 
     @Override
     public void setup() {
@@ -54,11 +55,11 @@ public class MyDrone extends IntegratedAgent {
         ACLMessage out = new ACLMessage();
 
         //Decision de los sensores con los que se loguea en el mundo
-        String attach[] = {"alive", "distance", "altimeter", "gps", "visual", "angular", "compass", "energy"};
+        String attach[] = {"alive", "distance", "altimeter", "gps", "visual", "angular", "compass", "energy", "ontarget"};
         nSensores = attach.length;
 
         //Iniciar sesion en el mundo
-        ACLMessage in = login(out, "Playground1", attach);
+        ACLMessage in = login(out, "Playground2", attach);
 
         String answer = in.getContent();
         out = in.createReply();
@@ -71,11 +72,11 @@ public class MyDrone extends IntegratedAgent {
             Info("Detalles del error: " + details);
         }
 
-        while (ontarget != 1) {
+        while (!rescatado) {
             //Lecutra de sensores
             readSensores(out, in);
             ArrayList<String> acciones = calcularAccion();
-
+            
             for (String accion : acciones) {
                 json = new JsonObject();
                 json.add("command", "execute");
@@ -203,7 +204,7 @@ public class MyDrone extends IntegratedAgent {
                     alive = j.asObject().get("data").asArray().get(0).asInt();
                     break;
                 case ("compass"):
-                    compass = j.asObject().get("data").asArray().get(0).asInt();
+                    compass = (int) j.asObject().get("data").asArray().get(0).asDouble();
                     break;
                 case ("angular"):
                     angular = j.asObject().get("data").asArray().get(0).asDouble();
@@ -275,13 +276,247 @@ public class MyDrone extends IntegratedAgent {
         diferenciaDistancias(casillas, distancias);
         
         burbuja(casillas, distancias);
+        //Miramos si estamos encima del objetivo
+        if (ontarget == 1){
+            //Bajamos a rescatarlo
+            ArrayList<String> bajar = new ArrayList<>();
+            //Bajar hasta altimetro = 5
+            Info("El altimetro: " + altimeter);
+            Info("Bajamos " + altimeter/5 + " veces");
+            for (int i = 0; i < altimeter/5; i++) {
+                //Info("**");
+                bajar.add("moveD");
+            }
+            //Aterrizar (touchD)
+            bajar.add("touchD");
+            rescatado = true;
+            
+            return bajar;
+        }
+        
 
         
         //En orden, mirar que se pueda ir a la siguiente casilla
+        String casilla = casillas.get(0);
+        int anguloCasilla;
+        double direccionGiro;
+        int ngiros;
+        int diferenciaAltura;
+        switch(casilla){
+            case "NO":
+                anguloCasilla = -45;
+                //calcular cuanto tiene que girar
+                direccionGiro = Math.abs(anguloCasilla - compass);
+                ngiros = Math.abs((anguloCasilla - compass) / 45);
+                for(int i = 0; i < ngiros; i++){
+                    if(direccionGiro <= 180){
+                        acciones.add("rotateL");
+                    }
+                    else {
+                        acciones.add("rotateR");
+                    }
+                }
+                
+                //Mirar la altura de la casilla
+                diferenciaAltura = altimeter - mundo[position[0]-1][position[1]-1];
+                for(int i = 0; i < diferenciaAltura/5; i++){
+                    if(diferenciaAltura >= 0){
+                        //Baja
+                        acciones.add("moveD");
+                    } else {
+                        //Sube 
+                        acciones.add("moveUP");
+                    }
+                }
+                    
+                break;
+            case "N":
+                anguloCasilla = 0;
+                //calcular cuanto tiene que girar
+                direccionGiro = Math.abs(anguloCasilla - compass);
+                ngiros = Math.abs((anguloCasilla - compass) / 45);
+                for(int i = 0; i < ngiros; i++){
+                    if(direccionGiro <= 180){
+                        acciones.add("rotateL");
+                    }
+                    else {
+                        acciones.add("rotateR");
+                    }
+                }
+                 //Mirar la altura de la casilla
+                diferenciaAltura = altimeter - mundo[position[0]][position[1]-1];
+                for(int i = 0; i < diferenciaAltura/5; i++){
+                    if(diferenciaAltura >= 0){
+                        //Baja
+                        acciones.add("moveD");
+                    } else {
+                        //Sube 
+                        acciones.add("moveUP");
+                    }
+                }
+                break;
+            case "NE":
+                anguloCasilla = 45;
+                //calcular cuanto tiene que girar
+                direccionGiro = Math.abs(anguloCasilla - compass);
+                ngiros = Math.abs((anguloCasilla - compass) / 45);
+                for(int i = 0; i < ngiros; i++){
+                    if(direccionGiro <= 180){
+                        acciones.add("rotateL");
+                    }
+                    else {
+                        acciones.add("rotateR");
+                    }
+                }
+                 //Mirar la altura de la casilla
+                diferenciaAltura = altimeter - mundo[position[0]+1][position[1]-1];
+                for(int i = 0; i < diferenciaAltura/5; i++){
+                    if(diferenciaAltura >= 0){
+                        //Baja
+                        acciones.add("moveD");
+                    } else {
+                        //Sube 
+                        acciones.add("moveUP");
+                    }
+                }
+                break;
+            case "E":
+                anguloCasilla = 90;
+                //calcular cuanto tiene que girar
+                direccionGiro = Math.abs(anguloCasilla - compass);
+                ngiros = Math.abs((anguloCasilla - compass) / 45);
+                for(int i = 0; i < ngiros; i++){
+                    if(direccionGiro <= 180){
+                        acciones.add("rotateL");
+                    }
+                    else {
+                        acciones.add("rotateR");
+                    }
+                }
+                 //Mirar la altura de la casilla
+                diferenciaAltura = altimeter - mundo[position[0]+1][position[1]];
+                for(int i = 0; i < diferenciaAltura/5; i++){
+                    if(diferenciaAltura >= 0){
+                        //Baja
+                        acciones.add("moveD");
+                    } else {
+                        //Sube 
+                        acciones.add("moveUP");
+                    }
+                }
+                break;
+            case "SE":
+                anguloCasilla = 135;
+                //calcular cuanto tiene que girar
+                direccionGiro = Math.abs(anguloCasilla - compass);
+                ngiros = Math.abs((anguloCasilla - compass) / 45);
+                for(int i = 0; i < ngiros; i++){
+                    if(direccionGiro <= 180){
+                        acciones.add("rotateL");
+                    }
+                    else {
+                        acciones.add("rotateR");
+                    }
+                }
+                 //Mirar la altura de la casilla
+                diferenciaAltura = altimeter - mundo[position[0]+1][position[1]+1];
+                for(int i = 0; i < diferenciaAltura/5; i++){
+                    if(diferenciaAltura >= 0){
+                        //Baja
+                        acciones.add("moveD");
+                    } else {
+                        //Sube 
+                        acciones.add("moveUP");
+                    }
+                }
+                break;
+            case "S":
+                anguloCasilla = 180;
+                //calcular cuanto tiene que girar
+                direccionGiro = Math.abs(anguloCasilla - compass);
+                ngiros = Math.abs((anguloCasilla - compass) / 45);
+                for(int i = 0; i < ngiros; i++){
+                    if(direccionGiro <= 180){
+                        acciones.add("rotateL");
+                    }
+                    else {
+                        acciones.add("rotateR");
+                    }
+                }
+                 //Mirar la altura de la casilla
+                diferenciaAltura = altimeter - mundo[position[0]][position[1]+1];
+                for(int i = 0; i < diferenciaAltura/5; i++){
+                    if(diferenciaAltura >= 0){
+                        //Baja
+                        acciones.add("moveD");
+                    } else {
+                        //Sube 
+                        acciones.add("moveUP");
+                    }
+                }
+                break;
+            case "SO":
+                anguloCasilla = -135;
+                //calcular cuanto tiene que girar
+                direccionGiro = Math.abs(anguloCasilla - compass);
+                ngiros = Math.abs((anguloCasilla - compass) / 45);
+                for(int i = 0; i < ngiros; i++){
+                    if(direccionGiro <= 180){
+                        acciones.add("rotateL");
+                    }
+                    else {
+                        acciones.add("rotateR");
+                    }
+                }
+                 //Mirar la altura de la casilla
+                diferenciaAltura = altimeter - mundo[position[0]-1][position[1]+1];
+                for(int i = 0; i < diferenciaAltura/5; i++){
+                    if(diferenciaAltura >= 0){
+                        //Baja
+                        acciones.add("moveD");
+                    } else {
+                        //Sube 
+                        acciones.add("moveUP");
+                    }
+                }
+                break;
+            case "O":
+                anguloCasilla = -90;
+                //calcular cuanto tiene que girar
+                direccionGiro = Math.abs(anguloCasilla - compass);
+                ngiros = Math.abs((anguloCasilla - compass) / 45);
+                for(int i = 0; i < ngiros; i++){
+                    if(direccionGiro <= 180){
+                        acciones.add("rotateL");
+                    }
+                    else {
+                        acciones.add("rotateR");
+                    }
+                }
+                 //Mirar la altura de la casilla
+                diferenciaAltura = altimeter - mundo[position[0]-1][position[1]];
+                for(int i = 0; i < diferenciaAltura/5; i++){
+                    if(diferenciaAltura >= 0){
+                        //Baja
+                        acciones.add("moveD");
+                    } else {
+                        //Sube 
+                        acciones.add("moveUP");
+                    }
+                }
+                break;
+        }
+        //Ir hacia delante
+        acciones.add("moveF");
         
         //Mirar si hay que recarga batería antes de realizar las acciones
         Info("Coste: " + coste(acciones));
         Info("Queda energia: " + energy);
+        
+        for(int i = 0; i < acciones.size(); i++){
+                System.out.print(acciones.get(i) + ", ");
+            }
+
         
         if (energy_u > (energy - coste(acciones))) {
             ArrayList<String> bajar = new ArrayList<>();
@@ -289,7 +524,7 @@ public class MyDrone extends IntegratedAgent {
             Info("El altimetro: " + altimeter);
             Info("Bajamos " + altimeter/5 + " veces");
             for (int i = 0; i < altimeter/5; i++) {
-                Info("**");
+                //Info("**");
                 bajar.add("moveD");
             }
             //Aterrizar (touchD)
@@ -333,68 +568,115 @@ public class MyDrone extends IntegratedAgent {
     
     private void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
         //TODO meter solo las casillas disponibles: cuando este en los bordes que no lo haga
-        //if position[0] > 0 && position[1] > 0
-        casillas.add("NO");
-        if(memoria[position[0]-1][position[1]-1] == 1){
-            distancias.add(Double.POSITIVE_INFINITY);
-        }else {
-            distancias.add(Math.abs((double) angular - (-45)));
+        if (position[0] > 0 && position[1] > 0){
+            casillas.add("NO");
+            if(memoria[position[0]-1][position[1]-1] == 1){
+                distancias.add(10000.0);
+            }else if(mundo[position[0]-1][position[1]-1] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) angular - (-45)));
+            }
         }
+            
         
-        //if position[1] > 0
-        casillas.add("N");
-        if(memoria[position[0]][position[1]-1] == 1){
-            distancias.add(Double.POSITIVE_INFINITY);
-        }else {
-            distancias.add(Math.abs((double) angular));
+        if (position[1] > 0){
+            casillas.add("N");
+            if(memoria[position[0]][position[1]-1] == 1){
+                distancias.add(10000.0);
+            }else if(mundo[position[0]][position[1]-1] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) angular));
+            }
         }
+            
         
-        //if position[1] > 0 && position[0] < (width - 1)
-        casillas.add("NE");
-        if(memoria[position[0]+1][position[1]-1] == 1){
-            distancias.add(Double.POSITIVE_INFINITY);
-        }else {
-           distancias.add(Math.abs((double) angular - (45)));
+        if (position[1] > 0 && position[0] < (width - 1)){
+            casillas.add("NE");
+            if(memoria[position[0]+1][position[1]-1] == 1){
+                distancias.add(10000.0);
+            }else if(mundo[position[0]+1][position[1]-1] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+               distancias.add(Math.abs((double) angular - (45)));
+            }
         }
+            
        
-        //if position[0] < (width - 1)
-        casillas.add("E");
-        if(memoria[position[0]+1][position[1]] == 1){
-            distancias.add(Double.POSITIVE_INFINITY);
-        }else {
-            distancias.add(Math.abs((double) angular - (90)));
+        if (position[0] < (width - 1)){
+            casillas.add("E");
+            if(memoria[position[0]+1][position[1]] == 1){
+                distancias.add(10000.0);
+            }else if(mundo[position[0]+1][position[1]] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) angular - (90)));
+            }
         }
+            
         
-        //if position[0] < (width - 1) && position[1] < (width - 1)
-        casillas.add("SE");
-        if(memoria[position[0]+1][position[1]+1] == 1){
-            distancias.add(Double.POSITIVE_INFINITY);
-        }else {
-            distancias.add(Math.abs((double) angular - (135)));
+        if (position[0] < (width - 1) && position[1] < (width - 1)){
+            casillas.add("SE");
+            if(memoria[position[0]+1][position[1]+1] == 1){
+                distancias.add(10000.0);
+            }else if(mundo[position[0]+1][position[1]+1] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) angular - (135)));
+            }
         }
+            
         
-        //if position[1] < (width - 1)
-        casillas.add("S");
-        if(memoria[position[0]][position[1]+1] == 1){
-            distancias.add(Double.POSITIVE_INFINITY);
-        }else {
-            distancias.add(Math.abs((double) angular - (180)));
+        if (position[1] < (width - 1)){
+            casillas.add("S");
+            if(memoria[position[0]][position[1]+1] == 1){
+                distancias.add(10000.0);
+            }else if(mundo[position[0]][position[1]+1] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) angular - (180)));
+            }
         }
+            
         
-        //if position[1] < (width - 1) && position[0] > 0
-        casillas.add("SO");
-        if(memoria[position[0]-1][position[1]+1] == 1){
-            distancias.add(Double.POSITIVE_INFINITY);
-        }else {
-            distancias.add(Math.abs((double) angular - (-135)));
+        if (position[1] < (width - 1) && position[0] > 0){
+            casillas.add("SO");
+            if(memoria[position[0]-1][position[1]+1] == 1){
+                distancias.add(10000.0);
+            }else if(mundo[position[0]-1][position[1]+1] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) angular - (-135)));
+            }
         }
+            
         
-        //if position[0] > 0
-        casillas.add("O");
-        if(memoria[position[0]-1][position[1]] == 1){
-            distancias.add(Double.POSITIVE_INFINITY);
-        }else {
-            distancias.add(Math.abs((double) angular - (-90)));
+        if (position[0] > 0){
+            casillas.add("O");
+            if(memoria[position[0]-1][position[1]] == 1){
+                distancias.add(10000.0);
+            }else if(mundo[position[0]-1][position[1]] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) angular - (-90)));
+            }
         }
     }
     
