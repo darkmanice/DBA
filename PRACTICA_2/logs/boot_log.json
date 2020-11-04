@@ -17,3 +17,11 @@
 {"date":"02/11/2020_18:37:25","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 611111111111111111111111111111111 jade.security.JADESecurityException: Name-clash Agent 611111111111111111111111111111111@DBA already present in the platform "}}
 {"date":"02/11/2020_20:14:54","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 66666656456396 jade.security.JADESecurityException: Name-clash Agent 66666656456396@DBA already present in the platform "}}
 {"date":"02/11/2020_20:59:55","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 61111 jade.security.JADESecurityException: Name-clash Agent 61111@DBA already present in the platform "}}
+{"date":"03/11/2020_22:04:58","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 691 jade.security.JADESecurityException: Name-clash Agent 691@DBA already present in the platform "}}
+{"date":"04/11/2020_09:50:11","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 6911o23111 jade.security.JADESecurityException: Name-clash Agent 6911o23111@DBA already present in the platform "}}
+{"date":"04/11/2020_10:13:01","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 11111 jade.security.JADESecurityException: Name-clash Agent 11111@DBA already present in the platform "}}
+{"date":"04/11/2020_11:57:29","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 111 jade.security.JADESecurityException: Name-clash Agent 111@DBA already present in the platform "}}
+{"date":"04/11/2020_11:57:38","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 111 jade.security.JADESecurityException: Name-clash Agent 111@DBA already present in the platform "}}
+{"date":"04/11/2020_12:17:52","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 1111 jade.wrapper.ControllerException: FrontEndContainer  not found"}}
+{"date":"04/11/2020_12:18:05","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 1111 jade.wrapper.ControllerException: FrontEndContainer  not found"}}
+{"date":"04/11/2020_12:20:22","record":{"agent":"bootstrap","info":"jade.MicroBooot ERROR CREATING AGENT 1111 jade.security.JADESecurityException: Name-clash Agent 1111@DBA already present in the platform "}}
