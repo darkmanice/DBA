@@ -130,7 +130,17 @@ public class MyDrone extends IntegratedAgent {
         this.send(out);
         myControlPanel.close();
     }
-
+    /**
+     * 
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @author Alejandro
+     * @param out ACLMessage de salida
+     * @param mundo mundo al que nos queremos conectar
+     * @param sensores Cadena de los sensores que queremos conectar al drone
+     * @return 
+     */
     private ACLMessage login(ACLMessage out, String mundo, String sensores[]) {
         //PARSEAR JSON CON LOS DATOS A ENVIAR        
         String command = "login";
@@ -189,6 +199,14 @@ public class MyDrone extends IntegratedAgent {
         return in;
     }
 
+    /**
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @author Alejandro
+     * @param out ACLMessage de salida
+     * @param in ACLMessage de entrada
+     */
     private void readSensores(ACLMessage out, ACLMessage in) {
         JsonObject json = new JsonObject();
         json.add("command", "read");
@@ -288,6 +306,14 @@ public class MyDrone extends IntegratedAgent {
         
     }
 
+    /**
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     * @param angulo angulo en grados al que queremos girar el drone
+     * @param altura altura de la casilla a la que apunta el grado
+     * @return 
+     */
     private ArrayList<String> calculaGiroySubida(double angulo, int altura){
         ArrayList<String> acciones = new ArrayList<>();
         int anguloCasilla;
@@ -346,6 +372,13 @@ public class MyDrone extends IntegratedAgent {
         return acciones;
     }
     
+    /**
+     * Calcula la siguiente acción (o cadena de acciones) que debe realizar el drone
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     * @return 
+     */
     private ArrayList<String> calcularAccion() {
         ArrayList acciones = new ArrayList<String>();
 
@@ -459,7 +492,13 @@ public class MyDrone extends IntegratedAgent {
 
         return acciones;
     }
-    
+    /**
+     * @author Marina: formación
+     * @author Román: implementación
+     * @author Javier: modularización de la funcionalidad
+     * @param casillas Array con las casillas a las que el drone puede ir
+     * @param distancias Array con las distancias a las casillas que el drone puede ir
+     */
     private void burbuja(ArrayList<String> casillas, ArrayList<Double> distancias){
         //Ordenamos por orden de distancias
         int i;
@@ -485,7 +524,13 @@ public class MyDrone extends IntegratedAgent {
             }
         }
     }
-    
+    /**
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: Modularizacion de la funcionalidad
+     * @param casillas casillas a las que el drone puede ir
+     * @param distancias distancias de las casillas a las que el drone puede ir
+     */
     private void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
         //TODO meter solo las casillas disponibles: cuando este en los bordes que no lo haga
         if (position[0] > 0 && position[1] > 0){
@@ -600,6 +645,11 @@ public class MyDrone extends IntegratedAgent {
         }
     }
     
+    /**
+     * @autor Roman
+     * @param acciones lista de acciones que ejecuta el drone
+     * @return 
+     */
     private int coste(ArrayList<String> acciones){
         int coste = nSensores;
         
