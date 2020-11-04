@@ -40,6 +40,9 @@ public class MyDrone extends IntegratedAgent {
     private int altimeter;
     private int energy;
     
+    private int iterador = 0;
+    private int umbral_k = 800;
+    
     private int nSensores;  //Numero de sensores añadidos al drone
 
     private int energy_u = 50; //Umbral para recargar la batería
@@ -80,6 +83,8 @@ public class MyDrone extends IntegratedAgent {
         }
         
         while (!rescatado) {
+            //Incrementamos el iterador
+            iterador++;
             //Lecutra de sensores
             readSensores(out, in);
             
@@ -190,7 +195,7 @@ public class MyDrone extends IntegratedAgent {
         //Inicializar las matrices
         for (int i = 0; i < width+1; i++) {
             for (int j = 0; j < width+1; j++) {
-                memoria[i][j] = 0;
+                memoria[i][j] = -umbral_k;
                 this.mundo[i][j] = 0;
                 thermal[i][j] = -1;
             }
@@ -241,7 +246,7 @@ public class MyDrone extends IntegratedAgent {
                     position[0] = j.asObject().get("data").asArray().get(0).asArray().get(0).asInt();
                     position[1] = j.asObject().get("data").asArray().get(0).asArray().get(1).asInt();
                     position[2] = j.asObject().get("data").asArray().get(0).asArray().get(2).asInt();
-                    memoria[position[0]][position[1]] = 1;
+                    memoria[position[0]][position[1]] = iterador;
                     break;
 
                 case ("ontarget"):
@@ -532,10 +537,50 @@ public class MyDrone extends IntegratedAgent {
      * @param distancias distancias de las casillas a las que el drone puede ir
      */
     private void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
-        //TODO meter solo las casillas disponibles: cuando este en los bordes que no lo haga
+        if (position[0] < (width - 1) && position[1] < (width - 1)){
+            casillas.add("SE");
+            if(iterador - memoria[position[0]+1][position[1]+1] < umbral_k){
+                distancias.add(10000.0);
+            }else if(visual[32] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) angular - (135)));
+            }
+        }
+        
+            
+        
+        if (position[1] < (width - 1)){
+            casillas.add("S");
+            if(iterador - memoria[position[0]][position[1]+1] < umbral_k){
+                distancias.add(10000.0);
+            }else if(visual[31] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) angular - (180)));
+            }
+        }
+        
+        if (position[0] < (width - 1)){
+            casillas.add("E");
+            if(iterador - memoria[position[0]+1][position[1]] < umbral_k){
+                distancias.add(10000.0);
+            }else if(visual[25] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) angular - (90)));
+            }
+        }
+        
         if (position[0] > 0 && position[1] > 0){
             casillas.add("NO");
-            if(memoria[position[0]-1][position[1]-1] == 1){
+            if(iterador - memoria[position[0]-1][position[1]-1] < umbral_k){
                 distancias.add(10000.0);
             }else if(visual[16] >= maxflight) {
                 //Si esta casilla es mas alta que maxflight
@@ -549,7 +594,7 @@ public class MyDrone extends IntegratedAgent {
         
         if (position[1] > 0){
             casillas.add("N");
-            if(memoria[position[0]][position[1]-1] == 1){
+            if(iterador - memoria[position[0]][position[1]-1] < umbral_k){
                 distancias.add(10000.0);
             }else if(visual[17] >= maxflight) {
                 //Si esta casilla es mas alta que maxflight
@@ -563,7 +608,7 @@ public class MyDrone extends IntegratedAgent {
         
         if (position[1] > 0 && position[0] < (width - 1)){
             casillas.add("NE");
-            if(memoria[position[0]+1][position[1]-1] == 1){
+            if(iterador - memoria[position[0]+1][position[1]-1] < umbral_k){
                 distancias.add(10000.0);
             }else if(visual[18] >= maxflight) {
                 //Si esta casilla es mas alta que maxflight
@@ -575,51 +620,14 @@ public class MyDrone extends IntegratedAgent {
         }
             
        
-        if (position[0] < (width - 1)){
-            casillas.add("E");
-            if(memoria[position[0]+1][position[1]] == 1){
-                distancias.add(10000.0);
-            }else if(visual[25] >= maxflight) {
-                //Si esta casilla es mas alta que maxflight
-                distancias.add(Double.POSITIVE_INFINITY);
-            }
-            else {
-                distancias.add(Math.abs((double) angular - (90)));
-            }
-        }
+        
             
         
-        if (position[0] < (width - 1) && position[1] < (width - 1)){
-            casillas.add("SE");
-            if(memoria[position[0]+1][position[1]+1] == 1){
-                distancias.add(10000.0);
-            }else if(visual[32] >= maxflight) {
-                //Si esta casilla es mas alta que maxflight
-                distancias.add(Double.POSITIVE_INFINITY);
-            }
-            else {
-                distancias.add(Math.abs((double) angular - (135)));
-            }
-        }
-            
-        
-        if (position[1] < (width - 1)){
-            casillas.add("S");
-            if(memoria[position[0]][position[1]+1] == 1){
-                distancias.add(10000.0);
-            }else if(visual[31] >= maxflight) {
-                //Si esta casilla es mas alta que maxflight
-                distancias.add(Double.POSITIVE_INFINITY);
-            }
-            else {
-                distancias.add(Math.abs((double) angular - (180)));
-            }
-        }
             
         
         if (position[1] < (width - 1) && position[0] > 0){
             casillas.add("SO");
-            if(memoria[position[0]-1][position[1]+1] == 1){
+            if(iterador - memoria[position[0]-1][position[1]+1] < umbral_k){
                 distancias.add(10000.0);
             }else if(visual[30] >= maxflight) {
                 //Si esta casilla es mas alta que maxflight
@@ -633,7 +641,7 @@ public class MyDrone extends IntegratedAgent {
         
         if (position[0] > 0){
             casillas.add("O");
-            if(memoria[position[0]-1][position[1]] == 1){
+            if(iterador - memoria[position[0]-1][position[1]] < umbral_k){
                 distancias.add(10000.0);
             }else if(visual[23] >= maxflight) {
                 //Si esta casilla es mas alta que maxflight
