@@ -57,6 +57,7 @@ public class MyDrone extends IntegratedAgent {
 
         //Panel de control
         myControlPanel = new TTYControlPanel(this.getAID());
+        
     }
 
     @Override
@@ -228,7 +229,8 @@ public class MyDrone extends IntegratedAgent {
 
         //Info("La lectora de sensores es: " + answer);
         myControlPanel.feedData(in, width, height, maxflight);
-        myControlPanel.fancyShow();
+        //myControlPanel.fancyShow();
+        myControlPanel.plainShow();
 
         //Actualizacion de los sensores 
         for (JsonValue j : json.get("details").asObject().get("perceptions").asArray()) {
@@ -393,7 +395,17 @@ public class MyDrone extends IntegratedAgent {
 
         diferenciaDistancias(casillas, distancias);
         
+        Info("Angular es: " + angular);
+        
+        for(int i = 0; i < casillas.size(); i++){
+            Info("Antes     Casilla: " + casillas.get(i) + ", distancia    " + distancias.get(i));
+        }
+        
         burbuja(casillas, distancias);
+        
+        for(int i = 0; i < casillas.size(); i++){
+            Info("Despues     Casilla: " + casillas.get(i) + ", distancia    " + distancias.get(i));
+        }
         //Miramos si estamos encima del objetivo
         if (distance == 0){
             Info("Target encontrado");
@@ -417,6 +429,8 @@ public class MyDrone extends IntegratedAgent {
         
         //En orden, mirar que se pueda ir a la siguiente casilla
         String casilla = casillas.get(0);
+        
+        Info("Voy a casilla " + casilla);
         int anguloCasilla;
         double direccionGiro;
         int ngiros;
@@ -546,7 +560,7 @@ public class MyDrone extends IntegratedAgent {
                 distancias.add(Double.POSITIVE_INFINITY);
             }
             else {
-                distancias.add(Math.abs((double) angular - (135)));
+                distancias.add(Math.abs((double) (angular + 360)%360 - (135)));
             }
         }
         
@@ -561,7 +575,7 @@ public class MyDrone extends IntegratedAgent {
                 distancias.add(Double.POSITIVE_INFINITY);
             }
             else {
-                distancias.add(Math.abs((double) angular - (180)));
+                distancias.add(Math.abs((double) (angular+360)%360 - (180)));
             }
         }
         
@@ -574,7 +588,7 @@ public class MyDrone extends IntegratedAgent {
                 distancias.add(Double.POSITIVE_INFINITY);
             }
             else {
-                distancias.add(Math.abs((double) angular - (90)));
+                distancias.add(Math.abs((double) (angular +360)%360- (90)));
             }
         }
         
@@ -587,7 +601,7 @@ public class MyDrone extends IntegratedAgent {
                 distancias.add(Double.POSITIVE_INFINITY);
             }
             else {
-                distancias.add(Math.abs((double) angular - (-45)));
+                distancias.add(Math.abs((double) (angular +360)%360 - (315)));
             }
         }
             
@@ -615,7 +629,7 @@ public class MyDrone extends IntegratedAgent {
                 distancias.add(Double.POSITIVE_INFINITY);
             }
             else {
-               distancias.add(Math.abs((double) angular - (45)));
+               distancias.add(Math.abs((double) (angular+360)%360 - (45)));
             }
         }
             
@@ -634,7 +648,7 @@ public class MyDrone extends IntegratedAgent {
                 distancias.add(Double.POSITIVE_INFINITY);
             }
             else {
-                distancias.add(Math.abs((double) angular - (-135)));
+                distancias.add(Math.abs((double) (angular+360)%360 - (225)));
             }
         }
             
@@ -648,7 +662,7 @@ public class MyDrone extends IntegratedAgent {
                 distancias.add(Double.POSITIVE_INFINITY);
             }
             else {
-                distancias.add(Math.abs((double) angular - (-90)));
+                distancias.add(Math.abs((double) (angular+360)%360 - (270)));
             }
         }
     }
