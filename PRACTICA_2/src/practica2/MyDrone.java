@@ -70,7 +70,7 @@ public class MyDrone extends IntegratedAgent {
         nSensores = attach.length;
 
         //Iniciar sesion en el mundo
-        ACLMessage in = login(out, "World9", attach);
+        ACLMessage in = login(out, "Link@Playground1", attach);
 
         String answer = in.getContent();
         out = in.createReply();
@@ -229,8 +229,8 @@ public class MyDrone extends IntegratedAgent {
 
         //Info("La lectora de sensores es: " + answer);
         myControlPanel.feedData(in, width, height, maxflight);
-        //myControlPanel.fancyShow();
-        myControlPanel.plainShow();
+        myControlPanel.fancyShow();
+        //myControlPanel.fancyShowMicro();
 
         //Actualizacion de los sensores 
         for (JsonValue j : json.get("details").asObject().get("perceptions").asArray()) {
@@ -395,17 +395,17 @@ public class MyDrone extends IntegratedAgent {
 
         diferenciaDistancias(casillas, distancias);
         
-        Info("Angular es: " + angular);
+        //Info("Angular es: " + angular);
         
-        for(int i = 0; i < casillas.size(); i++){
+        /*for(int i = 0; i < casillas.size(); i++){
             Info("Antes     Casilla: " + casillas.get(i) + ", distancia    " + distancias.get(i));
-        }
+        }*/
         
         burbuja(casillas, distancias);
         
-        for(int i = 0; i < casillas.size(); i++){
+       /* for(int i = 0; i < casillas.size(); i++){
             Info("Despues     Casilla: " + casillas.get(i) + ", distancia    " + distancias.get(i));
-        }
+        }*/
         //Miramos si estamos encima del objetivo
         if (distance == 0){
             Info("Target encontrado");
@@ -430,7 +430,7 @@ public class MyDrone extends IntegratedAgent {
         //En orden, mirar que se pueda ir a la siguiente casilla
         String casilla = casillas.get(0);
         
-        Info("Voy a casilla " + casilla);
+        //Info("Voy a casilla " + casilla);
         int anguloCasilla;
         double direccionGiro;
         int ngiros;
@@ -551,6 +551,19 @@ public class MyDrone extends IntegratedAgent {
      * @param distancias distancias de las casillas a las que el drone puede ir
      */
     private void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
+        if (position[0] < (width - 1)){
+            casillas.add("E");
+            if(iterador - memoria[position[0]+1][position[1]] < umbral_k){
+                distancias.add(10000.0);
+            }else if(visual[25] >= maxflight) {
+                //Si esta casilla es mas alta que maxflight
+                distancias.add(Double.POSITIVE_INFINITY);
+            }
+            else {
+                distancias.add(Math.abs((double) (angular +360)%360- (90)));
+            }
+        }
+                
         if (position[0] < (width - 1) && position[1] < (width - 1)){
             casillas.add("SE");
             if(iterador - memoria[position[0]+1][position[1]+1] < umbral_k){
@@ -579,18 +592,6 @@ public class MyDrone extends IntegratedAgent {
             }
         }
         
-        if (position[0] < (width - 1)){
-            casillas.add("E");
-            if(iterador - memoria[position[0]+1][position[1]] < umbral_k){
-                distancias.add(10000.0);
-            }else if(visual[25] >= maxflight) {
-                //Si esta casilla es mas alta que maxflight
-                distancias.add(Double.POSITIVE_INFINITY);
-            }
-            else {
-                distancias.add(Math.abs((double) (angular +360)%360- (90)));
-            }
-        }
         
         if (position[0] > 0 && position[1] > 0){
             casillas.add("NO");

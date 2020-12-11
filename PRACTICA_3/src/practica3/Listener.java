@@ -58,7 +58,7 @@ public class Listener extends IntegratedAgent {
                 }
                 myStatus = "CHECKOUT-LARVA";
                 break;
-            case "CHECKOUTT-LARVA":
+            case "CHECKOUT-LARVA":
                 Info("Haciendo checkout de LARVA en" + _identitymanager);
                 in = sendCheckoutLARVA(_identitymanager);
                 myStatus = "EXIT";
