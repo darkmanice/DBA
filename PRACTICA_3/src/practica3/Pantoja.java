@@ -6,6 +6,7 @@ import YellowPages.YellowPages;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
+import static ACLMessageTools.ACLMessageTools.getJsonContentACLM;
 import com.eclipsesource.json.JsonObject;
 import java.util.ArrayList;
 
@@ -77,7 +78,7 @@ public class Pantoja extends IntegratedAgent {
                 myYP.updateYellowPages(in);
                 System.out.print(myYP.prettyPrint());
 
-                /*if (myYP.queryProvidersofService(myService).isEmpty()) {
+                if (myYP.queryProvidersofService(myService).isEmpty()) {
                     Info("\t" + "No hay ningun agente que proporcione el servicio: " + myService);
                     myStatus = "CHECKOUT-LARVA";
                     break;
@@ -99,8 +100,48 @@ public class Pantoja extends IntegratedAgent {
                 //Guardamos el conversationID
                 myConvID = in.getConversationId();
                 Info("ConversationID " + myConvID);
-               */
-                myStatus = "CHECKOUT-LARVA";
+               
+                myStatus = "PROCESS-MAP";
+    
+                break;
+                
+            case "PROCESS-MAP":
+                System("Save map of world " + myWorld);
+                // Examines the content of the message from server
+                JsonObject jscontent = getJsonContentACLM(in);
+                if (jscontent.names().contains("map")) {
+                    JsonObject jsonMapFile = jscontent.get("map").asObject();
+                    String mapfilename = jsonMapFile.getString("filename", "nonamefound");
+                    Info("Mapa Encontrado " + mapfilename);
+                    myMap = new Map2DGrayscale();
+                    if (myMap.fromJson(jsonMapFile)) {
+                        Info("Map " + mapfilename + "( " + myMap.getWidth() + "cols x" + myMap.getHeight()
+                                + "rows ) saved on disk (project's root folder) and ready in memory");
+                        Info("Sampling three random points for cross-check:");
+                        int px, py;
+                        for (int ntimes = 0; ntimes < 3; ntimes++) {
+                            px = (int) (Math.random() * myMap.getWidth());
+                            py = (int) (Math.random() * myMap.getHeight());
+                            Info("\tX: " + px + ", Y:" + py + " = " + myMap.getLevel(px, py));
+                        }
+                        myStatus = "CANCEL-WM";
+                    } else {
+                        Info("\t" + "There was an error processing and saving the image ");
+                        myStatus = "CANCEL-WM";
+                        break;
+                    }
+                } else {
+                    Info("\t" + "There is no map found in the message");
+                    myStatus = "CANCEL-WM";
+                    break;
+                }
+                myStatus = "MANDAR-MENSAJE-LISTENER";
+                break; 
+                
+            case "MANDAR-MENSAJE-LISTENER":
+                Info("Enviar mensaje al listener");
+                mandarMensaje("Listener");
+                myStatus = "CANCEL-WM";
                 break;
                 
             case "CANCEL-WM":
@@ -192,5 +233,17 @@ public class Pantoja extends IntegratedAgent {
         out.setPerformative(ACLMessage.CANCEL);
         send(out);
         return blockingReceive();
+    }
+
+    private void mandarMensaje(String im) {
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID(im, AID.ISLOCALNAME));
+        out.setContent(myConvID);
+        out.setProtocol("ANALYTICS");
+        out.setEncoding(_myCardID.getCardID());
+        out.setPerformative(ACLMessage.QUERY_IF);
+        send(out);
+        
     }
 }
