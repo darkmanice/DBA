@@ -1,14 +1,6 @@
 SAMPLE.cardID
-/PRACTICA_1/build/
-/PRACTICA_1/dist/
 *.log
 *.lock
 *log.json
-/PRACTICA_2/build/
-/PRACTICA_2/dist/
-PRACTICA_2/logs/74384999_log.json
-lib/*
-PRACTICA_1/nbproject/private/private.xml
-PRACTICA_2/nbproject/private/private.properties
-PRACTICA_2/nbproject/private/private.xml
-PRACTICA_2/nbproject/private/private.properties
+build/*
+dist/*
