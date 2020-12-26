@@ -9,6 +9,8 @@ import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
 import static ACLMessageTools.ACLMessageTools.getJsonContentACLM;
 import com.eclipsesource.json.JsonObject;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Agente que hace las veces de controlador y de jefe de equipo. Es el primero
@@ -76,7 +78,7 @@ public class Pantoja extends IntegratedAgent {
                 }
                 //Mostrar las YP
                 myYP.updateYellowPages(in);
-                System.out.print(myYP.prettyPrint());
+                // System.out.print(myYP.prettyPrint());
 
                 if (myYP.queryProvidersofService(myService).isEmpty()) {
                     Info("\t" + "No hay ningun agente que proporcione el servicio: " + myService);
@@ -135,14 +137,28 @@ public class Pantoja extends IntegratedAgent {
                     myStatus = "CANCEL-WM";
                     break;
                 }
-                myStatus = "MANDAR-MENSAJE-LISTENER";
+                myStatus = "MANDAR-CONVID";
                 break; 
                 
-            case "MANDAR-MENSAJE-LISTENER":
-                Info("Enviar mensaje al listener");
-                mandarMensaje("Listener");
-                myStatus = "CANCEL-WM";
+            case "MANDAR-CONVID":
+                Info("Enviando ConversationID a todos los agentes");
+                mandarConvId("Listener");
+                mandarConvId("Rescuer");
+                myStatus = "WAITING";
                 break;
+                
+            case "WAITING":
+                
+                    try { //Simulamos que los rescuers nos mandan un adios
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Pantoja.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                //Mandamos mensaje a Listener para que cierre
+                mandarMensaje("Listener", "Cerramos el chiringuito");
+                myStatus="CANCEL-WM";
+                break;
+
                 
             case "CANCEL-WM":
                 Info("Cerrando el juego");
@@ -235,7 +251,18 @@ public class Pantoja extends IntegratedAgent {
         return blockingReceive();
     }
 
-    private void mandarMensaje(String im) {
+    private void mandarMensaje(String im, String content) {
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID(im, AID.ISLOCALNAME));
+        out.setContent(content);
+        out.setProtocol("ANALYTICS");
+        out.setEncoding(_myCardID.getCardID());
+        out.setPerformative(ACLMessage.QUERY_IF);
+        send(out);
+        
+    }
+    private void mandarConvId(String im) {
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID(im, AID.ISLOCALNAME));

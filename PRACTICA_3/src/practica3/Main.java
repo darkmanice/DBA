@@ -13,7 +13,9 @@ public class Main {
         ConsoleBoot app = new ConsoleBoot("HACKATHON", args);
         app.selectConnection();
         
+        
         app.launchAgent("Listener", Listener.class);
+        app.launchAgent("Rescuer", Rescuer.class);
         app.launchAgent("Pantoja", Pantoja.class);
         
         app.shutDown();        
