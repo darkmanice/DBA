@@ -78,7 +78,7 @@ public class Pantoja extends IntegratedAgent {
                 }
                 //Mostrar las YP
                 myYP.updateYellowPages(in);
-                // System.out.print(myYP.prettyPrint());
+                //System.out.print(myYP.prettyPrint());
 
                 if (myYP.queryProvidersofService(myService).isEmpty()) {
                     Info("\t" + "No hay ningun agente que proporcione el servicio: " + myService);
@@ -87,6 +87,7 @@ public class Pantoja extends IntegratedAgent {
                 }
                 //Cogemos el World Manager de la lista de servicios
                 myWorldManager = myYP.queryProvidersofService(myService).iterator().next();
+                Info("myWorldManager: "+ myWorldManager);
                 Info("Cogemos el WorldManager");
                 //Nos suscribimos
                 in = sendSubscribeWM(myWorld);

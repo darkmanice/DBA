@@ -7,11 +7,13 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Stack;
-
 
 /**
  * Agente que se dedica a rescatar. 
@@ -20,12 +22,15 @@ import java.util.Stack;
 public class Rescuer extends IntegratedAgent {
 
     protected YellowPages myYP;
-    protected String myStatus, myService, myWorldManager, myConvID;
+    protected String myStatus, myService, myWorldManager, myConvID, myReplyWith;
     protected ArrayList<String> myShops, myWishlist;
     protected boolean myError;
     protected Stack myCoins;
     protected ACLMessage in, out;
     protected Map2DGrayscale myMap;
+    protected HashMap<String, Integer> tienda0 = new HashMap<String, Integer>();
+    protected HashMap<String, Integer> tienda1 = new HashMap<String, Integer>();
+    protected HashMap<String, Integer> tienda2 = new HashMap<String, Integer>();
 
     @Override
     public void setup() {
@@ -45,7 +50,7 @@ public class Rescuer extends IntegratedAgent {
         
         //Lista de articulos deseados
         myWishlist = new ArrayList<>();
-       
+        myWishlist.add("LIDAR");
         
         //Coins
         myCoins = new Stack();
@@ -120,6 +125,10 @@ public class Rescuer extends IntegratedAgent {
                 }
                 Info("RESCUER suscrito al WM");
                 
+                //Guardamos la ReplyWith
+                myReplyWith = in.getReplyWith();
+                Info("ReplyWith: " + myReplyWith);
+                
                 //Guardamos nuestras monedas
                 for(JsonValue j : Json.parse(in.getContent()).asObject().get("coins").asArray()){
                     myCoins.add(j.asString());
@@ -140,9 +149,9 @@ public class Rescuer extends IntegratedAgent {
                 }
                 //Actualizar las YP
                 myYP.updateYellowPages(in);
-                //System.out.println(myYP.prettyPrint());
+               // System.out.println(myYP.prettyPrint());
                 
-                for(String str: myYP.queryProvidersofService("shop")){
+                for(String str: myYP.queryProvidersofService("shop@" + myConvID)){
                     myShops.add(str);
                 }
                 if (myShops.isEmpty()) {
@@ -155,6 +164,7 @@ public class Rescuer extends IntegratedAgent {
                 break;
                 
             case "SHOPPING":
+                
                 in = getProductos(myShops.get(0));
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
@@ -163,8 +173,15 @@ public class Rescuer extends IntegratedAgent {
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
-                Info(in.getContent());
-                /* in = getProductos(myShops.get(1));
+                // Info(in.getContent());
+                
+                //Pasamos el content a HashMap
+                for(JsonValue j : Json.parse(in.getContent()).asObject().get("products").asArray()){
+                    tienda0.put(j.asObject().get("reference").asString(),j.asObject().get("price").asInt());
+                    
+                }
+                
+                in = getProductos(myShops.get(1));
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
                     Info("\t" + ACLMessage.getPerformative(in.getPerformative())
@@ -172,8 +189,14 @@ public class Rescuer extends IntegratedAgent {
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
-                Info(in.getContent());
-                 in = getProductos(myShops.get(2));
+                
+                //Pasamos el content a HashMap
+                for(JsonValue j : Json.parse(in.getContent()).asObject().get("products").asArray()){
+                    tienda1.put(j.asObject().get("reference").asString(),j.asObject().get("price").asInt());
+                    
+                }
+                
+                in = getProductos(myShops.get(2));
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
                     Info("\t" + ACLMessage.getPerformative(in.getPerformative())
@@ -181,7 +204,15 @@ public class Rescuer extends IntegratedAgent {
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
-                Info(in.getContent());*/
+                
+                //Pasamos el content a HashMap
+                for(JsonValue j : Json.parse(in.getContent()).asObject().get("products").asArray()){
+                    tienda2.put(j.asObject().get("reference").asString(),j.asObject().get("price").asInt());
+                }
+                
+                //Algoritmo que gestiona las compras
+                comprar(myWishlist);
+                
                 myStatus = "CHECKOUT-LARVA";
                 break;
                 
@@ -267,4 +298,122 @@ public class Rescuer extends IntegratedAgent {
         this.send(out);
         return this.blockingReceive();
     }
+    
+    private void comprar(ArrayList<String> miLista){
+        Info("Comprando...");
+        
+        String eleccionTienda0 = "";
+        String eleccionTienda1 = "";
+        String eleccionTienda2 = "";
+        
+        int precioAuxiliar0 = 0;
+        int precioAuxiliar1 = 0;
+        int precioAuxiliar2 = 0;
+        
+        //Por cada elemento de la lista de deseos
+        for(String elemento: miLista){
+            //Comprobamos en cada tienda cual es el articulo mas barato con ese nombre
+            //TIENDA 0
+            for(String i : tienda0.keySet()){
+                String auxiliar = i.split("#")[0];
+                if(auxiliar.equals(elemento)){
+                    Info("ENcuentro un elemento igual");
+                    if(eleccionTienda0 == ""){
+                       eleccionTienda0 = i;
+                       precioAuxiliar0 = tienda0.get(i);
+                    }
+                    else{ //Hay que elegir el precio mas barato
+                        if(precioAuxiliar0 > tienda0.get(i)){ //Intercambiamos el articulo
+                            eleccionTienda0 = i;
+                        }
+                    }
+                }
+            }
+            //TIENDA 1
+            for(String i : tienda1.keySet()){
+                String auxiliar = i.split("#")[0];
+                if(auxiliar.equals(elemento)){
+                    if(eleccionTienda1 == ""){
+                       eleccionTienda1 = i;
+                       precioAuxiliar1 = tienda1.get(i);
+                    }
+                    else{ //Hay que elegir el precio mas barato
+                        if(precioAuxiliar1 > tienda1.get(i)){ //Intercambiamos el articulo
+                            eleccionTienda1 = i;
+                        }
+                    }
+                }
+            }
+            //TIENDA 2
+            for(String i : tienda2.keySet()){
+                String auxiliar = i.split("#")[0];
+                if(auxiliar.equals(elemento)){
+                    if(eleccionTienda2 == ""){
+                       eleccionTienda2 = i;
+                       precioAuxiliar2 = tienda2.get(i);
+                    }
+                    else{ //Hay que elegir el precio mas barato
+                        if(precioAuxiliar2 > tienda2.get(i)){ //Intercambiamos el articulo
+                            eleccionTienda2 = i;
+                        }
+                    }
+                }
+            }
+            
+            //Comparamos los elementos elegidos de las tres tiendas
+            ArrayList<Integer> precios = new ArrayList<>();
+            precios.add(precioAuxiliar0);
+            precios.add(precioAuxiliar1);
+            precios.add(precioAuxiliar2);
+            
+            int min = 0, indice = 0;
+            for (int i=0; i<precios.size(); i++) {
+                Info("PRECIOS DISPONIBLES: " + precios.get(i));
+                if (precios.get(i) < min) {
+                    min = precios.get(i);
+                    indice = i;
+                }
+            }
+            
+            
+            //Obtenemos la eleccion y enviamos accion de comprar
+            switch(indice){
+                case 0:
+                    Info("La mejor eleccion es: " +  eleccionTienda0 + " " + precioAuxiliar0);
+                    in = sendComprar(eleccionTienda0, myShops.get(0));
+                    break;
+                case 1:
+                    Info("La mejor eleccion es: " +  eleccionTienda1 + " " + precioAuxiliar1);
+                   
+                    in = sendComprar(eleccionTienda1, myShops.get(1));
+                    break;
+                case 2:
+                    Info("La mejor eleccion es: " +  eleccionTienda2 + " " + precioAuxiliar2);
+                   
+                    in = sendComprar(eleccionTienda2, myShops.get(2));
+                    break;
+            }
+             
+            
+        }
+    }
+    
+     private ACLMessage sendComprar(String producto, String tienda) {
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID(tienda, AID.ISLOCALNAME));
+        JsonObject contenido = new JsonObject();
+        contenido.add("operation", "buy").toString();
+        contenido.add("reference", producto).toString();
+        JsonArray array = new JsonArray();
+        array.add((String) myCoins.get(0));
+        contenido.add("payment", array).toString();
+        Info("Content " + contenido);
+        out.setContent(new JsonObject().add("operation", "buy").toString());
+        out.setPerformative(ACLMessage.REQUEST);
+        out.setConversationId(myConvID);
+        this.send(out);
+        return this.blockingReceive();
+    }
+    
 }
