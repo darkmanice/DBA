@@ -25,9 +25,12 @@ public class Pantoja extends IntegratedAgent {
     protected boolean myError;
     protected ACLMessage in, out;
     protected Map2DGrayscale myMap;
+    
+    int contador;
 
     @Override
     public void setup() {
+        contador = 1;
         _identitymanager = "Sphinx";
         super.setup();
 
@@ -150,8 +153,16 @@ public class Pantoja extends IntegratedAgent {
                 
             case "WAITING":
                 
+                while (contador != 0){
+                    in = blockingReceive();
+                    if(in.getContent().equals("LOGOUT")){
+                        contador--;
+                    }
+                    
+                }
+                
                     try { //Simulamos que los rescuers nos mandan un adios
-                        Thread.sleep(10000);
+                        Thread.sleep(3000);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Pantoja.class.getName()).log(Level.SEVERE, null, ex);
                     }
