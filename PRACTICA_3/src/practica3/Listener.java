@@ -90,7 +90,7 @@ public class Listener extends IntegratedAgent {
                 Info("Esperando SESSIONID");
                 in = blockingReceive();
                 if(in.getPerformative() == ACLMessage.QUERY_IF){
-                    myConvID = in.getContent();
+                    myConvID = in.getConversationId();
                     myStatus = "SUBSCRIBE-WM";
                 }
                 break;
@@ -106,7 +106,6 @@ public class Listener extends IntegratedAgent {
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
-                Info("LISTENER suscrito al WM");
                 myStatus = "LISTENING";
                 break;
                 
@@ -185,7 +184,6 @@ public class Listener extends IntegratedAgent {
         out.addReceiver(new AID(myWorldManager, AID.ISLOCALNAME));
         out.setProtocol("REGULAR");
         out.setContent(new JsonObject().add("type", tipo).toString());
-        Info(new JsonObject().add("type", tipo).toString());
         out.setPerformative(ACLMessage.SUBSCRIBE);
         out.setConversationId(myConvID);
         this.send(out);
