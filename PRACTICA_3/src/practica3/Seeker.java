@@ -15,14 +15,20 @@ import java.util.ArrayList;
  *
  * @author prueba
  */
-public class Rescuer extends Drone {
+public class Seeker extends Drone{
     
     @Override
     public void setup(){
         super.setup();
         
-        //Lista de articulos deseados
-        myWishlist.add("LIDAR");
+        //Lista de articulos deseados   //"alive", "distance", "gps", "visual", "angular", "compass", "energy"
+        myWishlist.add("DISTANCE"); 
+        myWishlist.add("GPS"); 
+        myWishlist.add("VISUAL"); 
+        myWishlist.add("ANGULAR"); 
+        myWishlist.add("COMPASS"); 
+        myWishlist.add("ENERGY"); 
+        
     }
 
     @Override
@@ -168,5 +174,4 @@ public class Rescuer extends Drone {
 
         }
     }
-
 }

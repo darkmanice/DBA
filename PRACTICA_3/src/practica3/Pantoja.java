@@ -25,9 +25,12 @@ public class Pantoja extends IntegratedAgent {
     protected boolean myError;
     protected ACLMessage in, out;
     protected Map2DGrayscale myMap;
+    
+    int contador;
 
     @Override
     public void setup() {
+        contador = 2;
         _identitymanager = "Sphinx";
         super.setup();
 
@@ -87,8 +90,6 @@ public class Pantoja extends IntegratedAgent {
                 }
                 //Cogemos el World Manager de la lista de servicios
                 myWorldManager = myYP.queryProvidersofService(myService).iterator().next();
-                Info("myWorldManager: "+ myWorldManager);
-                Info("Cogemos el WorldManager");
                 //Nos suscribimos
                 in = sendSubscribeWM(myWorld);
 
@@ -102,7 +103,6 @@ public class Pantoja extends IntegratedAgent {
                 }
                 //Guardamos el conversationID
                 myConvID = in.getConversationId();
-                Info("ConversationID " + myConvID);
                
                 myStatus = "PROCESS-MAP";
     
@@ -143,15 +143,49 @@ public class Pantoja extends IntegratedAgent {
                 
             case "MANDAR-CONVID":
                 Info("Enviando ConversationID a todos los agentes");
-                mandarConvId("Listener");
-                mandarConvId("Rescuer");
+                
+                int coordx, coordy;
+                JsonObject contenido;
+                
+                //Generar las coordenadas de inicio de los 
+                //Seeker1
+                coordx = myMap.getWidth() / 2  +2;
+                coordy = myMap.getHeight() / 2  +2;
+                contenido = new JsonObject();
+                contenido.add("X", coordx);
+                contenido.add("Y", coordy);
+                mandarConvId("Seeker1", contenido.toString());
+                
+                //Seeker2
+                //Rescuer1 (Coentro del mapa)
+                coordx = myMap.getWidth() / 2;
+                coordy = myMap.getHeight() / 2;
+                contenido = new JsonObject();
+                contenido.add("X", coordx);
+                contenido.add("Y", coordy);
+                mandarConvId("Rescuer1", contenido.toString());
+                
+                
+                //Rescuer2
+                
+                mandarConvId("Listener", "");
+                
+                mandarConvId("AWACS_CELLNEX", "");
                 myStatus = "WAITING";
                 break;
                 
             case "WAITING":
                 
+                while (contador != 0){
+                    in = blockingReceive();
+                    if(in.getContent().equals("LOGOUT")){
+                        contador--;
+                    }
+                    
+                }
+                
                     try { //Simulamos que los rescuers nos mandan un adios
-                        Thread.sleep(10000);
+                        Thread.sleep(3000);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Pantoja.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -164,6 +198,8 @@ public class Pantoja extends IntegratedAgent {
             case "CANCEL-WM":
                 Info("Cerrando el juego");
                 in = sendCANCELWM();
+                //Avisamos a AWACS
+                sendCANCELAWACS();
                 myStatus = "CHECKOUT-LARVA";
                 break;
                 
@@ -263,15 +299,27 @@ public class Pantoja extends IntegratedAgent {
         send(out);
         
     }
-    private void mandarConvId(String im) {
+    private void mandarConvId(String im, String coor) {
         out = new ACLMessage();
         out.setSender(getAID());
         out.addReceiver(new AID(im, AID.ISLOCALNAME));
-        out.setContent(myConvID);
+        out.setContent(coor);
+        out.setConversationId(myConvID);
         out.setProtocol("ANALYTICS");
         out.setEncoding(_myCardID.getCardID());
         out.setPerformative(ACLMessage.QUERY_IF);
         send(out);
         
+    }
+
+    private void sendCANCELAWACS() {
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID("AWACS", AID.ISLOCALNAME));
+        out.setContent("");
+        out.setConversationId(myConvID);
+        out.setProtocol("ANALYTICS");
+        out.setPerformative(ACLMessage.CANCEL);
+        send(out);
     }
 }
