@@ -117,6 +117,7 @@ public class Pantoja extends IntegratedAgent {
                     String mapfilename = jsonMapFile.getString("filename", "nonamefound");
                     Info("Mapa Encontrado " + mapfilename);
                     myMap = new Map2DGrayscale();
+         
                     if (myMap.fromJson(jsonMapFile)) {
                         Info("Map " + mapfilename + "( " + myMap.getWidth() + "cols x" + myMap.getHeight()
                                 + "rows ) saved on disk (project's root folder) and ready in memory");
@@ -154,7 +155,8 @@ public class Pantoja extends IntegratedAgent {
                 contenido = new JsonObject();
                 contenido.add("X", coordx);
                 contenido.add("Y", coordy);
-                mandarConvId("Seeker1", contenido.toString());
+                contenido.add("altura", myMap.getMaxHeight());
+                mandarConvId("Cajal", contenido.toString());
                 
                 //Seeker2
                 //Rescuer1 (Coentro del mapa)
@@ -163,7 +165,8 @@ public class Pantoja extends IntegratedAgent {
                 contenido = new JsonObject();
                 contenido.add("X", coordx);
                 contenido.add("Y", coordy);
-                mandarConvId("Rescuer1", contenido.toString());
+                contenido.add("altura", myMap.getMaxHeight()-5);
+                mandarConvId("Ramon", contenido.toString());
                 
                 
                 //Rescuer2

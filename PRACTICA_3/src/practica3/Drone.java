@@ -6,6 +6,7 @@ import YellowPages.YellowPages;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
+import ControlPanel.TTYControlPanel;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -23,20 +24,49 @@ import java.util.Stack;
 public abstract class Drone extends IntegratedAgent {
 
     protected YellowPages myYP;
-    protected String myStatus, myService, myWorldManager, myConvID, myReplyWith, myCoach;
+    protected String myStatus, myService, myWorldManager, myConvID, myReplyWith, myCoach, myProblem;
     protected ArrayList<String> myShops, myWishlist, mySensors;
     protected boolean myError;
-    protected Stack myCoins, auxCoins;
+    protected Stack myCoins, auxCoins, myCharges;
     protected ACLMessage in, out;
     protected Map2DGrayscale myMap;
+    private TTYControlPanel myControlPanel;
 
     protected int[] CoordInicio = new int[2];
+    protected int altura_max;
 
     //Tiendas disponibles en el mundo
     protected HashMap<String, Integer> tienda0 = new HashMap<String, Integer>();
     protected HashMap<String, Integer> tienda1 = new HashMap<String, Integer>();
     protected HashMap<String, Integer> tienda2 = new HashMap<String, Integer>();
+    
+    //Sensores
+    private int memoria[][]; //Se inicializa con width x width 0, 1 si ya hemos pasado
+    private int position[] = new int[3]; //Posicion del drone
+    private int lidar[][] = new int[7][7];
+    private double thermal[][];
+    private int visual[] = new int[7*7];    //Vector con los datos arrojados por visual
+                                            //NO 16    //N 17  //NE 18
+                                            //O 23     //D 24  //E 25
+                                            //SO 30    //S 31  //SE 32
 
+    private int compass = -90;
+    private double angular;
+    private int ontarget;
+    private int alive;
+    private double payload;
+    private double distance;
+    private int altimeter;
+    private int energy;
+    
+    
+    //Variables para conteo de la memoria del dron
+    private int iterador = 0;
+    private int umbral_k = 800;
+    
+    //Umbral para recargar la batería
+    private int energy_u = 20; 
+    
     @Override
     public void setup() {
         _identitymanager = "Sphinx";
@@ -61,11 +91,20 @@ public abstract class Drone extends IntegratedAgent {
         //Coins
         myCoins = new Stack();
         auxCoins = new Stack();
+        myCharges = new Stack();
 
         // To detect possible errors
         myError = false;
         myYP = new YellowPages();
-
+        
+        //Problem
+        myProblem = "World1";
+        myMap = new Map2DGrayscale();
+        
+        //Panel de control
+        myControlPanel = new TTYControlPanel(this.getAID());
+        
+        
         _exitRequested = false;
     }
 
@@ -260,7 +299,12 @@ public abstract class Drone extends IntegratedAgent {
                     
                 } else {
                     String producto = Json.parse(in.getContent()).asObject().get("reference").asString();
-                    this.mySensors.add(producto);
+                    if(producto.contains("CHARGE")){
+                        this.myCharges.push(producto);
+                    }
+                    else{
+                        this.mySensors.add(producto);
+                    }
                     auxCoins = new Stack();
                 }
 
@@ -359,6 +403,22 @@ public abstract class Drone extends IntegratedAgent {
         return true;
     }
 
+    protected void inicializarSensores(){
+        //Sensores
+        
+        memoria = new int[myMap.getWidth()+4][myMap.getWidth()+4];
+        thermal = new double[myMap.getWidth()+4][myMap.getWidth()+4];
+
+        //Inicializar las matrices
+        for (int i = 0; i < myMap.getWidth()+1; i++) {
+            for (int j = 0; j < myMap.getWidth()+1; j++) {
+                memoria[i][j] = -umbral_k;
+                thermal[i][j] = -1;
+            }
+        }
+        Info(memoria[52][52]+"");
+    }
+    
     protected ACLMessage sendLoginProblem() {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -381,5 +441,190 @@ public abstract class Drone extends IntegratedAgent {
         this.send(out);
         return this.blockingReceive();
     }
+    
+    protected void readSensores() {
+        out = in.createReply();
+        JsonObject json = new JsonObject();
+        json.add("operation", "read");
+        String resultado = json.toString();
+        out.setConversationId(myConvID);
+        out.setContent(resultado);
+        out.setProtocol("REGULAR");
+        out.setPerformative(ACLMessage.QUERY_REF);
+        this.send(out);
 
+        in = this.blockingReceive();
+        String answer = in.getContent();
+        Info(answer);
+        json = Json.parse(answer).asObject();
+        out = in.createReply();
+
+        //Info("La lectora de sensores es: " + answer);
+        myControlPanel.feedData(in, myMap.getWidth(), myMap.getHeight(), myMap.getMaxHeight());
+        myControlPanel.fancyShow();
+        //myControlPanel.fancyShowMicro();
+
+        //Actualizacion de los sensores 
+        for (JsonValue j : json.get("details").asObject().get("perceptions").asArray()) {
+            switch (j.asObject().get("sensor").asString()) {
+                case ("alive"):
+                    alive = j.asObject().get("data").asArray().get(0).asInt();
+                    break;
+                case ("compass"):
+                    compass = (int) j.asObject().get("data").asArray().get(0).asDouble();
+                    break;
+                case ("angular"):
+                    angular = j.asObject().get("data").asArray().get(0).asDouble();
+                    break;
+                case ("gps"):
+                    position[0] = j.asObject().get("data").asArray().get(0).asArray().get(0).asInt();
+                    position[1] = j.asObject().get("data").asArray().get(0).asArray().get(1).asInt();
+                    position[2] = j.asObject().get("data").asArray().get(0).asArray().get(2).asInt();
+                    Info("****************"+position[0] + " " + position[1] + " " + iterador);
+                    Info(memoria[52][52] + "");
+                    //memoria[position[0]][position[1]] = iterador;
+                    break;
+
+                case ("ontarget"):
+                    ontarget = j.asObject().get("data").asArray().get(0).asInt();
+                    break;
+                case ("payload"):
+                    payload = j.asObject().get("data").asArray().get(0).asInt();
+                    break;
+                case ("distance"):
+                    distance = j.asObject().get("data").asArray().get(0).asDouble();
+                    //Info("Distancia: " + distance);
+                    break;
+                case ("energy"):
+                    energy = j.asObject().get("data").asArray().get(0).asInt();
+                    break;
+                case ("altimeter"):
+                    altimeter = j.asObject().get("data").asArray().get(0).asInt();
+                    break;
+            }
+        }
+
+        //Rellenar mundo, lidar y thermal tras leer el resto de sonsores
+        for (JsonValue j : json.get("details").asObject().get("perceptions").asArray()) {
+            if (j.asObject().get("sensor").asString().equals("visual")) {
+                for (int i = 0; i < 7; i++) {
+                    for (int k = 0; k < 7; k++) {
+                        visual[7 * i + k] = j.asObject().get("data").asArray().get(i).asArray().get(k).asInt();
+                    }
+                }
+
+                //Calculo de altumetro
+                altimeter = position[2] - visual[24];
+
+            }
+
+            if (j.asObject().get("sensor").asString().equals("lidar")) {
+                for (int i = 0; i < 7; i++) {
+                    for (int k = 0; k < 7; k++) {
+                        if ((position[0] - 3 + i) >= 0 && (position[1] - 3 + k) >= 0) {
+                            lidar[position[0] - 3 + i][position[1] - 3 + k] = j.asObject().get("data").asArray().get(i).asArray().get(k).asInt();
+                        }
+                    }
+                }
+            }
+
+            if (j.asObject().get("sensor").asString().equals("thermal")) {
+                for (int i = 0; i < 7; i++) {
+                    for (int k = 0; k < 7; k++) {
+                        if ((position[0] - 3 + i) >= 0 && (position[1] - 3 + k) >= 0) {
+                            thermal[position[0] - 3 + i][position[1] - 3 + k] = j.asObject().get("data").asArray().get(i).asArray().get(k).asDouble();
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+    
+    protected boolean elevar() {
+        while (position[2] < this.altura_max) {
+            if (energy_u > (energy - 5)) {
+                if(!recarga()){
+                    return false;
+                }
+            }
+            position[2] += 5;
+            in = sendAction("moveU");
+
+            myError = (in.getPerformative() != ACLMessage.INFORM);
+            if (myError) {
+                Info(ACLMessage.getPerformative(in.getPerformative())
+                        + " No se pudo hacer moveU en " + this.myWorldManager
+                        + " debido a " + getDetailsLARVA(in));
+                return false;
+            }
+            
+        }
+        return true;
+    }
+
+    protected ACLMessage sendAction(String accion){
+        JsonObject contenido = new JsonObject();
+        contenido.add("operation", accion);
+        out.setContent(contenido.toString());
+        out.setConversationId(myConvID);
+        out.setProtocol("REGULAR");
+        out.setPerformative(ACLMessage.REQUEST);
+        
+        this.send(out);
+        return this.blockingReceive();
+    }
+    
+    protected boolean recarga(){
+        //Bajar hasta altimetro = 5
+        //Info("El altimetro: " + altimeter);
+        //Info("Bajamos " + altimeter/5 + " veces");
+        for (int i = 0; i < altimeter / 5; i++) {
+            in = sendAction("moveD");
+            myError = (in.getPerformative() != ACLMessage.INFORM);
+            if (myError) {
+                Info(ACLMessage.getPerformative(in.getPerformative())
+                        + " No se pudo hacer moveD en " + this.myWorldManager
+                        + " debido a " + getDetailsLARVA(in));
+                return false;
+            }
+            //Aterrizar (touchD)
+            sendAction("touchD");
+            myError = (in.getPerformative() != ACLMessage.INFORM);
+            if (myError) {
+                Info(ACLMessage.getPerformative(in.getPerformative())
+                        + " No se pudo hacer touchD en " + this.myWorldManager
+                        + " debido a " + getDetailsLARVA(in));
+                return false;
+            }
+            //recharge
+            Info("Recarga bateria");
+            in = sendRecharge();
+            
+            myError = (in.getPerformative() != ACLMessage.INFORM);
+            if (myError) {
+                Info(ACLMessage.getPerformative(in.getPerformative())
+                        + " No se pudo hacer recharge en " + this.myWorldManager
+                        + " debido a " + getDetailsLARVA(in));
+                return false;
+            }
+            
+
+        }
+        return true;
+    }
+    
+    protected ACLMessage sendRecharge(){
+        JsonObject contenido = new JsonObject();
+        contenido.add("operation", "recharge");
+        contenido.add("recharge", (String) myCharges.pop());
+        out.setContent(contenido.toString());
+        out.setConversationId(myConvID);
+        out.setProtocol("REGULAR");
+        out.setPerformative(ACLMessage.REQUEST);
+        
+        this.send(out);
+        return this.blockingReceive();
+    }
 }

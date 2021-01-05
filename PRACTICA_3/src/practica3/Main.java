@@ -16,9 +16,9 @@ public class Main {
         
         app.launchAgent("AWACS_CELLNEX", Awacs.class);
         app.launchAgent("Listener", Listener.class);
-        app.launchAgent("Rescuer1", Rescuer.class);
+        app.launchAgent("Ramon", Rescuer.class);
 //        app.launchAgent("Rescuer2", Rescuer.class);
-        app.launchAgent("Seeker1", Seeker.class);
+        app.launchAgent("Cajal", Seeker.class);
 //        app.launchAgent("Seeker2", Seeker.class);
         app.launchAgent("Pantoja", Pantoja.class);
         

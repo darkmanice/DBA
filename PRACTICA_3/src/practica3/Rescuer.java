@@ -9,7 +9,10 @@ import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonValue;
 import jade.lang.acl.ACLMessage;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -137,6 +140,16 @@ public class Rescuer extends Drone {
                 break;
                 
             case "LOGIN-PROBLEM":
+                
+                try {
+                    //Cargar el mapa
+                    Info("Cargando mapa...");
+                    myMap.loadMap(myProblem + ".png");
+                } catch (IOException ex) {
+                    Logger.getLogger(Seeker.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //Inicializamos los sensores del dron
+                inicializarSensores();
                 //Pasamos los sensores y las coordenadas de inicio al WM
                 
                 in = sendLoginProblem();

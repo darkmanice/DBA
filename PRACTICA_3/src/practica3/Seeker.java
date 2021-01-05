@@ -9,7 +9,10 @@ import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonValue;
 import jade.lang.acl.ACLMessage;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -24,7 +27,6 @@ public class Seeker extends Drone{
         //Lista de articulos deseados   //"alive", "distance", "gps", "visual", "angular", "compass", "energy"
         myWishlist.add("DISTANCE"); 
         myWishlist.add("GPS"); 
-        myWishlist.add("VISUAL"); 
         myWishlist.add("ANGULAR"); 
         myWishlist.add("COMPASS"); 
         myWishlist.add("ENERGY"); 
@@ -79,6 +81,7 @@ public class Seeker extends Drone{
                     Info("Contenido: " + in.getContent());
                     CoordInicio[0] = Json.parse(in.getContent()).asObject().get("X").asInt();
                     CoordInicio[1] = Json.parse(in.getContent()).asObject().get("Y").asInt();
+                    altura_max = Json.parse(in.getContent()).asObject().get("altura").asInt();
                     
                     
                     myStatus = "SUBSCRIBE-WM";
@@ -143,8 +146,20 @@ public class Seeker extends Drone{
                 break;
                 
             case "LOGIN-PROBLEM":
-                //Pasamos los sensores y las coordenadas de inicio al WM
                 
+            
+                try {
+                    //Cargar el mapa
+                    Info("Cargando mapa...");
+                    myMap.loadMap(myProblem + ".png");
+                } catch (IOException ex) {
+                    Logger.getLogger(Seeker.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+               //Inicializamos los sensores del dron
+                inicializarSensores();
+                
+                //Pasamos los sensores y las coordenadas de inicio al WM
                 in = sendLoginProblem();
                 
                 myError = (in.getPerformative() != ACLMessage.INFORM);
@@ -156,7 +171,27 @@ public class Seeker extends Drone{
                     break;
                 }
                         
+                myStatus = "SEEKING";
+                break;
+
+                
+            case "SEEKING":
+                
+                //Leer los sensores
+                readSensores();
+                
+                //Elevar al agente a la maxima altura para evitar colisiones
+                if(!elevar()){
+                   myStatus = "CHECKOUT-LARVA";
+                   break;
+                }
+                //Calcular acciones posibles
+                
+                //Para cada una de las acciones, enviar mensajes al servidor
+                
+             
                 myStatus = "CHECKOUT-LARVA";
+                
                 break;
 
             case "CHECKOUT-LARVA":
