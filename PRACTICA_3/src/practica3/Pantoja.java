@@ -112,12 +112,12 @@ public class Pantoja extends IntegratedAgent {
                 System("Save map of world " + myWorld);
                 // Examines the content of the message from server
                 JsonObject jscontent = getJsonContentACLM(in);
+                //System.out.println(jscontent);
                 if (jscontent.names().contains("map")) {
                     JsonObject jsonMapFile = jscontent.get("map").asObject();
                     String mapfilename = jsonMapFile.getString("filename", "nonamefound");
                     Info("Mapa Encontrado " + mapfilename);
                     myMap = new Map2DGrayscale();
-         
                     if (myMap.fromJson(jsonMapFile)) {
                         Info("Map " + mapfilename + "( " + myMap.getWidth() + "cols x" + myMap.getHeight()
                                 + "rows ) saved on disk (project's root folder) and ready in memory");
@@ -127,6 +127,7 @@ public class Pantoja extends IntegratedAgent {
                             px = (int) (Math.random() * myMap.getWidth());
                             py = (int) (Math.random() * myMap.getHeight());
                             Info("\tX: " + px + ", Y:" + py + " = " + myMap.getLevel(px, py));
+                
                         }
                         myStatus = "CANCEL-WM";
                     } else {
@@ -155,7 +156,7 @@ public class Pantoja extends IntegratedAgent {
                 contenido = new JsonObject();
                 contenido.add("X", coordx);
                 contenido.add("Y", coordy);
-                contenido.add("altura", myMap.getMaxHeight());
+                contenido.add("altura", 0);
                 mandarConvId("Cajal", contenido.toString());
                 
                 //Seeker2
@@ -165,7 +166,7 @@ public class Pantoja extends IntegratedAgent {
                 contenido = new JsonObject();
                 contenido.add("X", coordx);
                 contenido.add("Y", coordy);
-                contenido.add("altura", myMap.getMaxHeight()-5);
+                contenido.add("altura",0);
                 mandarConvId("Ramon", contenido.toString());
                 
                 

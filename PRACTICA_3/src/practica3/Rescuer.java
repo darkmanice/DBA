@@ -26,6 +26,11 @@ public class Rescuer extends Drone {
         
         //Lista de articulos deseados
         myWishlist.add("LIDAR");
+        myWishlist.add("ANGULAR");
+        myWishlist.add("VISUAL");
+        myWishlist.add("COMPASS");
+        myWishlist.add("THERMAL");
+        myWishlist.add("ALIVE");
     }
 
     @Override
@@ -149,7 +154,7 @@ public class Rescuer extends Drone {
                     Logger.getLogger(Seeker.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 //Inicializamos los sensores del dron
-                inicializarSensores();
+                inicializarSensores(myMap);
                 //Pasamos los sensores y las coordenadas de inicio al WM
                 
                 in = sendLoginProblem();

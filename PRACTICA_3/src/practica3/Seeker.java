@@ -81,7 +81,6 @@ public class Seeker extends Drone{
                     Info("Contenido: " + in.getContent());
                     CoordInicio[0] = Json.parse(in.getContent()).asObject().get("X").asInt();
                     CoordInicio[1] = Json.parse(in.getContent()).asObject().get("Y").asInt();
-                    altura_max = Json.parse(in.getContent()).asObject().get("altura").asInt();
                     
                     
                     myStatus = "SUBSCRIBE-WM";
@@ -152,15 +151,17 @@ public class Seeker extends Drone{
                     //Cargar el mapa
                     Info("Cargando mapa...");
                     myMap.loadMap(myProblem + ".png");
+                    
                 } catch (IOException ex) {
                     Logger.getLogger(Seeker.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
                //Inicializamos los sensores del dron
-                inicializarSensores();
+                inicializarSensores(myMap);
                 
                 //Pasamos los sensores y las coordenadas de inicio al WM
                 in = sendLoginProblem();
+                Info("CONTENIDO: " +in.getContent());
                 
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
@@ -182,15 +183,25 @@ public class Seeker extends Drone{
                 
                 //Elevar al agente a la maxima altura para evitar colisiones
                 if(!elevar()){
+                   Info("NO SE HA PODIDO ELEVAR");
                    myStatus = "CHECKOUT-LARVA";
                    break;
                 }
                 //Calcular acciones posibles
-                
+                ArrayList<String> acciones = calcularAccionesPosibles();
                 //Para cada una de las acciones, enviar mensajes al servidor
-                
+                for(int i = 0; i<acciones.size(); i++){
+                    if(acciones.get(i).equals("FIN"))
+                        myStatus="CHECKOUT-LARVA";
+                    else{
+                        in = sendAction(acciones.get(i));
+                        myStatus ="SEEKING";
+                    }
+                    
+                }
              
-                myStatus = "CHECKOUT-LARVA";
+                
+                //myStatus = "SEEKING";
                 
                 break;
 

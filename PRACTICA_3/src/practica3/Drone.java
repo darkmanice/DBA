@@ -33,7 +33,7 @@ public abstract class Drone extends IntegratedAgent {
     private TTYControlPanel myControlPanel;
 
     protected int[] CoordInicio = new int[2];
-    protected int altura_max;
+    protected int altura_max = 255; //Comun a todos los mapas
 
     //Tiendas disponibles en el mundo
     protected HashMap<String, Integer> tienda0 = new HashMap<String, Integer>();
@@ -45,10 +45,10 @@ public abstract class Drone extends IntegratedAgent {
     private int position[] = new int[3]; //Posicion del drone
     private int lidar[][] = new int[7][7];
     private double thermal[][];
-    private int visual[] = new int[7*7];    //Vector con los datos arrojados por visual
+    /*private int visual[] = new int[7*7];    //Vector con los datos arrojados por visual
                                             //NO 16    //N 17  //NE 18
                                             //O 23     //D 24  //E 25
-                                            //SO 30    //S 31  //SE 32
+                                            //SO 30    //S 31  //SE 32*/
 
     private int compass = -90;
     private double angular;
@@ -56,7 +56,7 @@ public abstract class Drone extends IntegratedAgent {
     private int alive;
     private double payload;
     private double distance;
-    private int altimeter;
+    private int altimeter = 0;
     private int energy;
     
     
@@ -299,7 +299,9 @@ public abstract class Drone extends IntegratedAgent {
                     
                 } else {
                     String producto = Json.parse(in.getContent()).asObject().get("reference").asString();
+                    Info("producto: " +  producto);
                     if(producto.contains("CHARGE")){
+                        Info("Meto el charge: "+producto);
                         this.myCharges.push(producto);
                     }
                     else{
@@ -310,7 +312,6 @@ public abstract class Drone extends IntegratedAgent {
 
             }
         }
-
     }
 
     protected ACLMessage sendComprar(String producto, String tienda, int precio) {
@@ -403,7 +404,10 @@ public abstract class Drone extends IntegratedAgent {
         return true;
     }
 
-    protected void inicializarSensores(){
+    protected void inicializarSensores( Map2DGrayscale mapa){
+        //Captamos el mapa
+        myMap = mapa;
+        
         //Sensores
         
         memoria = new int[myMap.getWidth()+4][myMap.getWidth()+4];
@@ -416,7 +420,6 @@ public abstract class Drone extends IntegratedAgent {
                 thermal[i][j] = -1;
             }
         }
-        Info(memoria[52][52]+"");
     }
     
     protected ACLMessage sendLoginProblem() {
@@ -480,9 +483,7 @@ public abstract class Drone extends IntegratedAgent {
                     position[0] = j.asObject().get("data").asArray().get(0).asArray().get(0).asInt();
                     position[1] = j.asObject().get("data").asArray().get(0).asArray().get(1).asInt();
                     position[2] = j.asObject().get("data").asArray().get(0).asArray().get(2).asInt();
-                    Info("****************"+position[0] + " " + position[1] + " " + iterador);
-                    Info(memoria[52][52] + "");
-                    //memoria[position[0]][position[1]] = iterador;
+                    memoria[position[0]][position[1]] = iterador;
                     break;
 
                 case ("ontarget"):
@@ -506,17 +507,7 @@ public abstract class Drone extends IntegratedAgent {
 
         //Rellenar mundo, lidar y thermal tras leer el resto de sonsores
         for (JsonValue j : json.get("details").asObject().get("perceptions").asArray()) {
-            if (j.asObject().get("sensor").asString().equals("visual")) {
-                for (int i = 0; i < 7; i++) {
-                    for (int k = 0; k < 7; k++) {
-                        visual[7 * i + k] = j.asObject().get("data").asArray().get(i).asArray().get(k).asInt();
-                    }
-                }
-
-                //Calculo de altumetro
-                altimeter = position[2] - visual[24];
-
-            }
+            
 
             if (j.asObject().get("sensor").asString().equals("lidar")) {
                 for (int i = 0; i < 7; i++) {
@@ -543,14 +534,16 @@ public abstract class Drone extends IntegratedAgent {
     }
     
     protected boolean elevar() {
+       Info("Bateria: "+ energy);
         while (position[2] < this.altura_max) {
+            Info("Subiendo");
             if (energy_u > (energy - 5)) {
                 if(!recarga()){
                     return false;
                 }
             }
             position[2] += 5;
-            in = sendAction("moveU");
+            in = sendAction("moveUP");
 
             myError = (in.getPerformative() != ACLMessage.INFORM);
             if (myError) {
@@ -559,7 +552,7 @@ public abstract class Drone extends IntegratedAgent {
                         + " debido a " + getDetailsLARVA(in));
                 return false;
             }
-            
+            altimeter += 5;
         }
         return true;
     }
@@ -580,38 +573,45 @@ public abstract class Drone extends IntegratedAgent {
         //Bajar hasta altimetro = 5
         //Info("El altimetro: " + altimeter);
         //Info("Bajamos " + altimeter/5 + " veces");
-        for (int i = 0; i < altimeter / 5; i++) {
-            in = sendAction("moveD");
-            myError = (in.getPerformative() != ACLMessage.INFORM);
-            if (myError) {
-                Info(ACLMessage.getPerformative(in.getPerformative())
-                        + " No se pudo hacer moveD en " + this.myWorldManager
-                        + " debido a " + getDetailsLARVA(in));
-                return false;
+        Info("Recargando...");
+        for (int i = 0; i < position[2] / 5; i++) {
+            if(altimeter > 0){
+                in = sendAction("moveD");
+                myError = (in.getPerformative() != ACLMessage.INFORM);
+                if (myError) {
+                    Info(ACLMessage.getPerformative(in.getPerformative())
+                            + " No se pudo hacer moveD en " + this.myWorldManager
+                            + " debido a " + getDetailsLARVA(in));
+                    return false;
+                }
+                altimeter -= 5;
             }
-            //Aterrizar (touchD)
-            sendAction("touchD");
-            myError = (in.getPerformative() != ACLMessage.INFORM);
-            if (myError) {
-                Info(ACLMessage.getPerformative(in.getPerformative())
-                        + " No se pudo hacer touchD en " + this.myWorldManager
-                        + " debido a " + getDetailsLARVA(in));
-                return false;
-            }
-            //recharge
-            Info("Recarga bateria");
-            in = sendRecharge();
-            
-            myError = (in.getPerformative() != ACLMessage.INFORM);
-            if (myError) {
-                Info(ACLMessage.getPerformative(in.getPerformative())
-                        + " No se pudo hacer recharge en " + this.myWorldManager
-                        + " debido a " + getDetailsLARVA(in));
-                return false;
-            }
-            
-
+           
         }
+        //Aterrizar (touchD)
+        sendAction("touchD");
+        myError = (in.getPerformative() != ACLMessage.INFORM);
+        if (myError) {
+            Info(ACLMessage.getPerformative(in.getPerformative())
+                    + " No se pudo hacer touchD en " + this.myWorldManager
+                    + " debido a " + getDetailsLARVA(in));
+            return false;
+        }
+        //recharge
+        Info("Recarga bateria");
+        in = sendRecharge();
+
+        myError = (in.getPerformative() != ACLMessage.INFORM);
+        if (myError) {
+            Info(ACLMessage.getPerformative(in.getPerformative())
+                    + " No se pudo hacer recharge en " + this.myWorldManager
+                    + " debido a " + getDetailsLARVA(in));
+            return false;
+        }
+        //actualizamos manualmente la energia
+        energy = 1000;
+
+
         return true;
     }
     
@@ -626,5 +626,223 @@ public abstract class Drone extends IntegratedAgent {
         
         this.send(out);
         return this.blockingReceive();
+    }
+    
+    protected ArrayList<String> calcularAccionesPosibles(){
+        ArrayList<String> acciones = new ArrayList<>();
+        
+        //Hacia donde ir
+        ArrayList<String> casillas = new ArrayList<>();
+        ArrayList<Double> distancias = new ArrayList<>();
+        
+        diferenciaDistancias(casillas, distancias);
+        
+        burbuja(casillas, distancias);
+        
+        //Miramos si estamos encima del objetivo
+        if (distance == 0){
+            Info("Target encontrado");
+            //PRUEBA
+            acciones.add("FIN");
+        }
+        
+        //En orden, mirar que se pueda ir a la siguiente casilla
+        String casilla = casillas.get(0);
+        
+        //Info("Voy a casilla " + casilla);
+        int anguloCasilla;
+        double direccionGiro;
+        int ngiros;
+        int diferenciaAltura;
+        //Segun a la casilla a la que el drone decida ir:
+        //Info("Tengo que ir a la casilla " + casilla + "////////////");
+        switch(casilla){
+            case "NO":
+                anguloCasilla = -45;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                
+                break;
+            case "N":
+                anguloCasilla = 0;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "NE":
+                anguloCasilla = 45;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "E":
+                anguloCasilla = 90;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "SE":
+                anguloCasilla = 135;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "S":
+                anguloCasilla = 180;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "SO":
+                anguloCasilla = -135;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "O":
+                anguloCasilla = -90;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+        }
+        
+        //TODO: Mirar si hay que recarga batería antes de realizar las acciones
+        
+        return acciones;
+    }
+    
+    protected void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
+        if (position[0] < (myMap.getWidth() - 1)){
+            casillas.add("E");
+            if(iterador - memoria[position[0]+1][position[1]] < umbral_k){
+                distancias.add(10000.0);
+            } else {
+                distancias.add(Math.abs((double) (angular + 360) % 360 - (90)));
+            }
+        }
+        if (position[0] < (myMap.getWidth() - 1) && position[1] < (myMap.getWidth() - 1)) {
+            casillas.add("SE");
+            if (iterador - memoria[position[0] + 1][position[1] + 1] < umbral_k) {
+                distancias.add(10000.0);
+            } else {
+                distancias.add(Math.abs((double) (angular + 360) % 360 - (135)));
+            }
+        }
+        
+        if (position[1] < (myMap.getWidth() - 1)){
+            casillas.add("S");
+            if(iterador - memoria[position[0]][position[1]+1] < umbral_k){
+                distancias.add(10000.0);
+            }
+            else {
+                distancias.add(Math.abs((double) (angular+360)%360 - (180)));
+            }
+        }
+        
+        if (position[0] > 0 && position[1] > 0){
+            casillas.add("NO");
+            if(iterador - memoria[position[0]-1][position[1]-1] < umbral_k){
+                distancias.add(10000.0);
+            }
+            else {
+                distancias.add(Math.abs((double) (angular +360)%360 - (315)));
+            }
+        }
+        
+        if (position[1] > 0){
+            casillas.add("N");
+            if(iterador - memoria[position[0]][position[1]-1] < umbral_k){
+                distancias.add(10000.0);
+            }
+            else {
+                distancias.add(Math.abs((double) angular));
+            }
+        }
+        
+        if (position[1] > 0 && position[0] < (myMap.getWidth() - 1)){
+            casillas.add("NE");
+            if(iterador - memoria[position[0]+1][position[1]-1] < umbral_k){
+                distancias.add(10000.0);
+            }
+            else {
+               distancias.add(Math.abs((double) (angular+360)%360 - (45)));
+            }
+        }
+        
+        if (position[1] < (myMap.getWidth() - 1) && position[0] > 0){
+            casillas.add("SO");
+            if(iterador - memoria[position[0]-1][position[1]+1] < umbral_k){
+                distancias.add(10000.0);
+            }
+            else {
+                distancias.add(Math.abs((double) (angular+360)%360 - (225)));
+            }
+        }
+        
+        if (position[0] > 0){
+            casillas.add("O");
+            if(iterador - memoria[position[0]-1][position[1]] < umbral_k){
+                distancias.add(10000.0);
+            }
+            else {
+                distancias.add(Math.abs((double) (angular+360)%360 - (270)));
+            }
+        }
+    }
+    
+    protected void burbuja(ArrayList<String> casillas, ArrayList<Double> distancias) {
+        //Ordenamos por orden de distancias
+        int i;
+        boolean flag = true;
+        double temp;
+        String temps;
+
+        while (flag) {
+            flag = false;
+            for (i = 0; i < distancias.size() - 1; i++) {
+                if (distancias.get(i) > distancias.get(i + 1)) {
+                    temp = distancias.get(i);
+                    temps = casillas.get(i);
+
+                    distancias.set(i, distancias.get(i + 1));
+                    distancias.set(i + 1, temp);
+
+                    casillas.set(i, casillas.get(i + 1));
+                    casillas.set(i + 1, temps);
+
+                    flag = true;
+                }
+            }
+        }
+    }
+
+    private ArrayList<String> calculaGiroySubida(double angulo) {
+        ArrayList<String> acciones = new ArrayList<>();
+        int anguloCasilla;
+        double direccionGiro;
+        int ngirosD = 0;
+        int ngirosI = 0;
+        int anguloAux = (compass + 360) % 360;
+        int diferenciaAltura;
+        //calcular cuanto tiene que girar
+        while (anguloAux != (angulo + 360) % 360) {
+            ngirosD++;
+            anguloAux = (anguloAux + 45) % 360;
+        }
+
+        anguloAux = (compass + 360) % 360;
+
+        while (anguloAux != (angulo + 360) % 360) {
+            ngirosI++;
+            anguloAux = (anguloAux - 45 + 360) % 360;
+        }
+
+        if (ngirosD < ngirosI) {
+            for (int i = 0; i < ngirosD; i++) {
+                acciones.add("rotateR");
+            }
+        } else {
+            for (int i = 0; i < ngirosI; i++) {
+                acciones.add("rotateL");
+            }
+        }
+
+        acciones.add("moveF");
+
+        return acciones;
     }
 }
