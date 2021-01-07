@@ -110,6 +110,7 @@ public class Awacs extends IntegratedAgent {
                 if (!ReceiveAndShowTerminal()) {
                     myStatus = "EXIT";
                 }
+                
                 break;
             case "EXIT":
             default:

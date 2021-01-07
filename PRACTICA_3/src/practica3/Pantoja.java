@@ -156,7 +156,7 @@ public class Pantoja extends IntegratedAgent {
                 contenido = new JsonObject();
                 contenido.add("X", coordx);
                 contenido.add("Y", coordy);
-                contenido.add("altura", 0);
+                contenido.add("altura_max", 255);
                 mandarConvId("Cajal", contenido.toString());
                 
                 //Seeker2
@@ -166,7 +166,7 @@ public class Pantoja extends IntegratedAgent {
                 contenido = new JsonObject();
                 contenido.add("X", coordx);
                 contenido.add("Y", coordy);
-                contenido.add("altura",0);
+                contenido.add("altura_max",255);
                 mandarConvId("Ramon", contenido.toString());
                 
                 

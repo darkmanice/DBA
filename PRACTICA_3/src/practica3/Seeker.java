@@ -7,7 +7,9 @@ package practica3;
 
 import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,7 +83,7 @@ public class Seeker extends Drone{
                     Info("Contenido: " + in.getContent());
                     CoordInicio[0] = Json.parse(in.getContent()).asObject().get("X").asInt();
                     CoordInicio[1] = Json.parse(in.getContent()).asObject().get("Y").asInt();
-                    
+                    altura_max = Json.parse(in.getContent()).asObject().get("altura_max").asInt();
                     
                     myStatus = "SUBSCRIBE-WM";
                 }
@@ -180,6 +182,7 @@ public class Seeker extends Drone{
                 
                 //Leer los sensores
                 readSensores();
+                Info("Bateria despues de leer sensores: " + energy);
                 
                 //Elevar al agente a la maxima altura para evitar colisiones
                 if(!elevar()){
@@ -220,4 +223,132 @@ public class Seeker extends Drone{
 
         }
     }
+    protected ArrayList<String> calcularAccionesPosibles(){
+        ArrayList<String> acciones = new ArrayList<>();
+        
+        //Hacia donde ir
+        ArrayList<String> casillas = new ArrayList<>();
+        ArrayList<Double> distancias = new ArrayList<>();
+        
+        diferenciaDistancias(casillas, distancias);
+        
+        burbuja(casillas, distancias);
+        
+        //Miramos si estamos encima del objetivo
+        if (distance == 0){
+            Info("Target encontrado en: (" + position[0] + "," + position[1] + ")");
+            
+            //comunicar al rescuer la posicion del aleman
+            if(position[1] <= myMap.getHeight()/2 ){
+                //El target esta en la mitad superior y lo comunica al agente correspondiente -> Ramon
+                Info("Enviando coordenadas a Ramon");
+                sendSearchPoint("Ramon");
+            }
+            else{
+                Info("Enviando coordenadas a Ortega");
+                //sendSearchPoint("Ortega");
+            }
+            
+            //Lo mandamos al lado contrario del que estamos
+            if(position[0] <= myMap.getWidth() / 2){
+                //Esta a la izq, lo mandamos a la derecha
+                irA(position[0]+myMap.getWidth()/2, position[1]);
+                //Volvemos a calcular las acciones posibles para el siguiente objetivo
+                return calcularAccionesPosibles(); 
+            }
+            else{
+                //Esta a la derecha, lo mandamos a la izq
+                irA(position[0]-myMap.getWidth()/2, position[1]);
+                //Volvemos a calcular las acciones posibles para el siguiente objetivo
+                return calcularAccionesPosibles(); 
+            }
+        }
+        
+        //En orden, mirar que se pueda ir a la siguiente casilla
+        String casilla = casillas.get(0);
+        
+        //Info("Voy a casilla " + casilla);
+        int anguloCasilla;
+        double direccionGiro;
+        int ngiros;
+        int diferenciaAltura;
+        //Segun a la casilla a la que el drone decida ir:
+        //Info("Tengo que ir a la casilla " + casilla + "////////////");
+        switch(casilla){
+            case "NO":
+                anguloCasilla = -45;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                
+                break;
+            case "N":
+                anguloCasilla = 0;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "NE":
+                anguloCasilla = 45;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "E":
+                anguloCasilla = 90;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "SE":
+                anguloCasilla = 135;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "S":
+                anguloCasilla = 180;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "SO":
+                anguloCasilla = -135;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+            case "O":
+                anguloCasilla = -90;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                acciones = calculaGiroySubida(anguloCasilla);
+                break;
+        }
+        
+        //Mirar si hay que recarga batería antes de realizar las acciones
+        for(int i = 0; i < acciones.size(); i++){
+            Info("Acciones: "+ acciones.get(i));
+        }
+        
+        
+        if (energy_u > (energy - coste(acciones) - altimeter)){
+            Info("NO TENGO SUFICIENTE ENERGIA. Umbral: " + energy_u + " Energia actual: " + energy + " coste acciones: " + coste(acciones) + " altimetro: " +altimeter);
+            //Recargamos energia y volvemos a subir
+            recarga();
+            elevar();
+        }
+        else{
+            Info("TENGO SUFICIENTE ENERGIA " + energy + " PARA EJECUTAR " + coste(acciones));
+        }
+        return acciones;
+    }
+
+    private void sendSearchPoint(String agent) {
+        JsonObject contenido = new JsonObject();
+        contenido.add("posx", position[0]);
+        contenido.add("posy", position[1]);
+        out.setSender(getAID());
+        out.addReceiver(new AID(agent, AID.ISLOCALNAME));
+        out.setContent(contenido.toString());
+        out.setConversationId(myConvID);
+        out.setProtocol("REGULAR");
+        out.setPerformative(ACLMessage.REQUEST);
+        
+        this.send(out);
+    }
+
+    
 }

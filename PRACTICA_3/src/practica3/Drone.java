@@ -33,7 +33,7 @@ public abstract class Drone extends IntegratedAgent {
     private TTYControlPanel myControlPanel;
 
     protected int[] CoordInicio = new int[2];
-    protected int altura_max = 255; //Comun a todos los mapas
+    protected int altura_max = 0; //Comun a todos los mapas
 
     //Tiendas disponibles en el mundo
     protected HashMap<String, Integer> tienda0 = new HashMap<String, Integer>();
@@ -41,23 +41,23 @@ public abstract class Drone extends IntegratedAgent {
     protected HashMap<String, Integer> tienda2 = new HashMap<String, Integer>();
     
     //Sensores
-    private int memoria[][]; //Se inicializa con width x width 0, 1 si ya hemos pasado
-    private int position[] = new int[3]; //Posicion del drone
-    private int lidar[][] = new int[7][7];
-    private double thermal[][];
+    protected int memoria[][]; //Se inicializa con width x width 0, 1 si ya hemos pasado
+    protected int position[] = new int[3]; //Posicion del drone
+    protected int lidar[][] = new int[7][7];
+    protected double thermal[][];
     /*private int visual[] = new int[7*7];    //Vector con los datos arrojados por visual
                                             //NO 16    //N 17  //NE 18
                                             //O 23     //D 24  //E 25
                                             //SO 30    //S 31  //SE 32*/
 
-    private int compass = -90;
-    private double angular;
-    private int ontarget;
-    private int alive;
-    private double payload;
-    private double distance;
-    private int altimeter = 0;
-    private int energy;
+    protected int compass = -90;
+    protected double angular;
+    protected int ontarget;
+    protected int alive;
+    protected double payload;
+    protected double distance;
+    protected int altimeter = 0;
+    protected int energy;
     
     
     //Variables para conteo de la memoria del dron
@@ -65,7 +65,7 @@ public abstract class Drone extends IntegratedAgent {
     private int umbral_k = 800;
     
     //Umbral para recargar la batería
-    private int energy_u = 20; 
+    protected int energy_u = 250; 
     
     @Override
     public void setup() {
@@ -299,9 +299,9 @@ public abstract class Drone extends IntegratedAgent {
                     
                 } else {
                     String producto = Json.parse(in.getContent()).asObject().get("reference").asString();
-                    Info("producto: " +  producto);
+                    //Info("producto: " +  producto);
                     if(producto.contains("CHARGE")){
-                        Info("Meto el charge: "+producto);
+                       // Info("Meto el charge: "+producto);
                         this.myCharges.push(producto);
                     }
                     else{
@@ -508,6 +508,7 @@ public abstract class Drone extends IntegratedAgent {
         //Rellenar mundo, lidar y thermal tras leer el resto de sonsores
         for (JsonValue j : json.get("details").asObject().get("perceptions").asArray()) {
             
+            
 
             if (j.asObject().get("sensor").asString().equals("lidar")) {
                 for (int i = 0; i < 7; i++) {
@@ -530,19 +531,27 @@ public abstract class Drone extends IntegratedAgent {
             }
 
         }
+        
+        //Calculo del altimetro
+        altimeter = position[2] - myMap.getLevel(position[0], position[1]);
 
     }
     
     protected boolean elevar() {
-       Info("Bateria: "+ energy);
+       Info("Bateria antes de elevar: "+ energy);
         while (position[2] < this.altura_max) {
             Info("Subiendo");
             if (energy_u > (energy - 5)) {
+                Info("No tengo bateria para elevar, recargo");
                 if(!recarga()){
                     return false;
                 }
             }
+            else{
+                Info("Tengo bateria suficiente para seguir elevando: "+energy);
+            }
             position[2] += 5;
+            
             in = sendAction("moveUP");
 
             myError = (in.getPerformative() != ACLMessage.INFORM);
@@ -552,7 +561,8 @@ public abstract class Drone extends IntegratedAgent {
                         + " debido a " + getDetailsLARVA(in));
                 return false;
             }
-            altimeter += 5;
+            //Cada vez que subimos restamos energia
+            energy -= 5;
         }
         return true;
     }
@@ -571,11 +581,17 @@ public abstract class Drone extends IntegratedAgent {
     
     protected boolean recarga(){
         //Bajar hasta altimetro = 5
-        //Info("El altimetro: " + altimeter);
-        //Info("Bajamos " + altimeter/5 + " veces");
+        Info("Bateria antes de empezar a recargar " + energy);
+        Info("Bajamos " + altimeter/5 + " veces");
         Info("Recargando...");
-        for (int i = 0; i < position[2] / 5; i++) {
-            if(altimeter > 0){
+        int aux = altimeter;
+        int aux2 = energy;
+        readSensores();
+        
+        for (int i = 0; i < aux / 5; i++) {
+            if(aux > 0){
+                Info("BATERIA: " + energy);
+                Info("BATERIA AUX : " + aux2 + "BATERIA: " + energy);
                 in = sendAction("moveD");
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
@@ -584,10 +600,11 @@ public abstract class Drone extends IntegratedAgent {
                             + " debido a " + getDetailsLARVA(in));
                     return false;
                 }
-                altimeter -= 5;
+                //Restamos bateria manualmente
+                energy -= 5;
             }
-           
         }
+        Info("Hemos bajado");
         //Aterrizar (touchD)
         sendAction("touchD");
         myError = (in.getPerformative() != ACLMessage.INFORM);
@@ -597,6 +614,11 @@ public abstract class Drone extends IntegratedAgent {
                     + " debido a " + getDetailsLARVA(in));
             return false;
         }
+        //Restamos bateria manualmente
+        energy -= 5;
+        Info("Bateria despues de aterrizar: " + energy);
+        
+        
         //recharge
         Info("Recarga bateria");
         in = sendRecharge();
@@ -610,7 +632,9 @@ public abstract class Drone extends IntegratedAgent {
         }
         //actualizamos manualmente la energia
         energy = 1000;
+        Info("Bateria despues de recargar: " + energy);
 
+        
 
         return true;
     }
@@ -628,81 +652,35 @@ public abstract class Drone extends IntegratedAgent {
         return this.blockingReceive();
     }
     
-    protected ArrayList<String> calcularAccionesPosibles(){
-        ArrayList<String> acciones = new ArrayList<>();
-        
-        //Hacia donde ir
-        ArrayList<String> casillas = new ArrayList<>();
-        ArrayList<Double> distancias = new ArrayList<>();
-        
-        diferenciaDistancias(casillas, distancias);
-        
-        burbuja(casillas, distancias);
-        
-        //Miramos si estamos encima del objetivo
-        if (distance == 0){
-            Info("Target encontrado");
-            //PRUEBA
-            acciones.add("FIN");
+    
+    
+    protected int coste(ArrayList<String> acciones){
+        int coste = mySensors.size();
+       
+        for(int i=0; i<acciones.size(); i++){
+            switch(acciones.get(i)){
+                case "moveF":
+                    coste += 1;
+                    break;
+                case "rotateL":
+                    coste += 1;
+                    break;
+                case "rotateR":
+                    coste += 1;
+                    break;
+                case "moveUP":
+                    coste += 5;
+                    break;
+                case "moveD":
+                    coste += 5;
+                    break;
+                case "touchD":
+                    coste += 5;
+                    break;
+            }
         }
         
-        //En orden, mirar que se pueda ir a la siguiente casilla
-        String casilla = casillas.get(0);
-        
-        //Info("Voy a casilla " + casilla);
-        int anguloCasilla;
-        double direccionGiro;
-        int ngiros;
-        int diferenciaAltura;
-        //Segun a la casilla a la que el drone decida ir:
-        //Info("Tengo que ir a la casilla " + casilla + "////////////");
-        switch(casilla){
-            case "NO":
-                anguloCasilla = -45;
-                //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
-                
-                break;
-            case "N":
-                anguloCasilla = 0;
-                //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
-                break;
-            case "NE":
-                anguloCasilla = 45;
-                //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
-                break;
-            case "E":
-                anguloCasilla = 90;
-                //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
-                break;
-            case "SE":
-                anguloCasilla = 135;
-                //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
-                break;
-            case "S":
-                anguloCasilla = 180;
-                //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
-                break;
-            case "SO":
-                anguloCasilla = -135;
-                //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
-                break;
-            case "O":
-                anguloCasilla = -90;
-                //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
-                break;
-        }
-        
-        //TODO: Mirar si hay que recarga batería antes de realizar las acciones
-        
-        return acciones;
+        return coste;
     }
     
     protected void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
@@ -810,7 +788,7 @@ public abstract class Drone extends IntegratedAgent {
         }
     }
 
-    private ArrayList<String> calculaGiroySubida(double angulo) {
+    protected ArrayList<String> calculaGiroySubida(double angulo) {
         ArrayList<String> acciones = new ArrayList<>();
         int anguloCasilla;
         double direccionGiro;
@@ -844,5 +822,41 @@ public abstract class Drone extends IntegratedAgent {
         acciones.add("moveF");
 
         return acciones;
+    }
+    //(-angulo + 90) si es -180 pasarlo a 180
+    protected void irA(int destinox, int destinoy) {
+        double distancia;
+        double angulo;
+        ArrayList<String> actions = new ArrayList<>();
+        
+        //Leer sensores por primera vez
+        readSensores();
+        do{
+            //Calculamos el angulo segun el destino
+            distancia = Math.sqrt(Math.pow(destinox-position[0],2) + Math.pow(destinoy-position[1],2));
+            angulo = Math.toDegrees(Math.asin(-1*(destinoy - position[1])/distancia)) % 360;
+            if(angulo >= 270){
+                angulo = -(angulo - 360) + 90;
+            }else{
+                angulo = -angulo + 90;
+            }
+            actions = calculaGiroySubida(angulo);
+            
+            //Mirar si hay que recarga batería antes de realizar las acciones
+            if (energy_u > (energy - coste(actions) - altimeter)){
+                //Recargamos energia y volvemos a subir
+                recarga();
+                elevar();
+            }
+            
+            //Para cada accion, enviar mensaje al servidor
+            for(String a : actions){
+                in = sendAction(a);
+            }
+            //Actualizar sensores
+            readSensores();
+        }while(position[0] != destinox || position[1] != destinoy);
+        
+
     }
 }
