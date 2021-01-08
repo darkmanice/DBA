@@ -80,7 +80,6 @@ public class Seeker extends Drone{
                 if (in.getPerformative() == ACLMessage.QUERY_IF) {
                     myConvID = in.getConversationId();
                     //Coge las coordenadas de el content
-                    Info("Contenido: " + in.getContent());
                     CoordInicio[0] = Json.parse(in.getContent()).asObject().get("X").asInt();
                     CoordInicio[1] = Json.parse(in.getContent()).asObject().get("Y").asInt();
                     altura_max = Json.parse(in.getContent()).asObject().get("altura_max").asInt();
@@ -171,7 +170,6 @@ public class Seeker extends Drone{
                 
                 //Pasamos los sensores y las coordenadas de inicio al WM
                 in = sendLoginProblem();
-                Info("CONTENIDO: " +in.getContent());
                 
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
@@ -200,32 +198,6 @@ public class Seeker extends Drone{
 
                 
             case "SEEKING":
-                
-               /* //Leer los sensores
-                readSensores();
-                Info("Bateria despues de leer sensores: " + energy);
-                
-                //Elevar al agente a la maxima altura para evitar colisiones
-                if(!elevar()){
-                   Info("NO SE HA PODIDO ELEVAR");
-                   myStatus = "CHECKOUT-LARVA";
-                   break;
-                }
-                //Calcular acciones posibles
-                ArrayList<String> acciones = calcularAccionesPosibles();
-                //Para cada una de las acciones, enviar mensajes al servidor
-                for(int i = 0; i<acciones.size(); i++){
-                    if(acciones.get(i).equals("FIN"))
-                        myStatus="CHECKOUT-LARVA";
-                    else{
-                        in = sendAction(acciones.get(i));
-                        myStatus ="SEEKING";
-                    }
-                    
-                }
-             
-                
-                //myStatus = "SEEKING";*/
                 //**************************************************
                 //Incrementamos el iterador
                 iterador++;
@@ -243,7 +215,7 @@ public class Seeker extends Drone{
                 break;
 
             case "WAITING-RESCUER":
-                Info("WAITING RESCUERRRR");
+                Info("WAITING RESCUER");
                 //Elevamos dos veces al agente
                 if(energy_u > energy - 20){
                    recarga(); 
@@ -252,7 +224,6 @@ public class Seeker extends Drone{
                 in = sendAction("moveUP");
                 
                 in = blockingReceive();
-                Info("WAITIGN RESCUER MENSAJE: " + in.toString());
                
                 if (in.getPerformative() == ACLMessage.INFORM) {
                     myStatus = "SEEKING";
@@ -294,7 +265,7 @@ public class Seeker extends Drone{
             if(position[1] <= myMap.getHeight()/2 ){
                 //El target esta en la mitad superior y lo comunica al agente correspondiente -> Ramon
                 Info("Enviando coordenadas a Ortega");
-                //sendSearchPoint("Ortega");
+                sendSearchPoint("Ramon");
             }
             else{
                 Info("Enviando coordenadas a Ramon");
@@ -312,31 +283,14 @@ public class Seeker extends Drone{
             myStatus = "WAITING-RESCUER";
             return new ArrayList<>();
             
-            //Lo mandamos al lado contrario del que estamos
-            /*if(position[0] <= myMap.getWidth() / 2){
-                //Esta a la izq, lo mandamos a la derecha
-                irA(position[0]+myMap.getWidth()/2, position[1]);
-                //Volvemos a calcular las acciones posibles para el siguiente objetivo
-                return calcularAccionesPosibles(); 
-            }
-            else{
-                //Esta a la derecha, lo mandamos a la izq
-                irA(position[0]-myMap.getWidth()/2, position[1]);
-                //Volvemos a calcular las acciones posibles para el siguiente objetivo
-                return calcularAccionesPosibles(); 
-            }*/
         }
         
         //En orden, mirar que se pueda ir a la siguiente casilla
         String casilla = casillas.get(0);
-        
-        //Info("Voy a casilla " + casilla);
+
         int anguloCasilla;
-        double direccionGiro;
-        int ngiros;
-        int diferenciaAltura;
         //Segun a la casilla a la que el drone decida ir:
-        //Info("Tengo que ir a la casilla " + casilla + "////////////");
+
         switch(casilla){
             case "NO":
                 anguloCasilla = -45;
@@ -382,19 +336,11 @@ public class Seeker extends Drone{
         }
         
         //Mirar si hay que recarga batería antes de realizar las acciones
-        for(int i = 0; i < acciones.size(); i++){
-            Info("Acciones: "+ acciones.get(i));
-        }
-        
         //Hemos quitado -altimeter
         if (energy_u > (energy - coste(acciones))){
-            //Info("NO TENGO SUFICIENTE ENERGIA. Umbral: " + energy_u + " Energia actual: " + energy + " coste acciones: " + coste(acciones) + " altimetro: " +altimeter);
             //Recargamos energia y volvemos a subir
             recarga();
            // elevar();
-        }
-        else{
-            Info("TENGO SUFICIENTE ENERGIA " + energy + " PARA EJECUTAR " + coste(acciones));
         }
         return acciones;
     }

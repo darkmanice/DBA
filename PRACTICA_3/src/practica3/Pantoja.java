@@ -42,7 +42,7 @@ public class Pantoja extends IntegratedAgent {
         myService = "Analytics group Cellnex";
 
         // The world I am going to open
-        myWorld = "World1";
+        myWorld = "Playground1";
 
         // First state of the agent
         myStatus = "CHECKIN-LARVA";
@@ -151,8 +151,8 @@ public class Pantoja extends IntegratedAgent {
                 
                 //Generar las coordenadas de inicio de los 
                 //Seeker1
-                coordx = myMap.getWidth() / 2  +2;
-                coordy = myMap.getHeight() / 2  +2;
+                coordx = myMap.getWidth() / 2  -2;
+                coordy = myMap.getHeight() / 2  -2;
                 contenido = new JsonObject();
                 contenido.add("X", coordx);
                 contenido.add("Y", coordy);

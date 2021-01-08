@@ -21,15 +21,15 @@ import java.util.logging.Logger;
  * @author prueba
  */
 public class Rescuer extends Drone {
-    
+
     private String myPartner;
     private int destinox;
     private int destinoy;
-    
+
     @Override
-    public void setup(){
+    public void setup() {
         super.setup();
-        
+
         //Lista de articulos deseados
         myWishlist.add("GPS");
         myWishlist.add("COMPASS");
@@ -81,13 +81,11 @@ public class Rescuer extends Drone {
                 if (in.getPerformative() == ACLMessage.QUERY_IF) {
                     myConvID = in.getConversationId();
                     //Coge las coordenadas de el content
-                    Info("Contenido: " + in.getContent());
                     CoordInicio[0] = Json.parse(in.getContent()).asObject().get("X").asInt();
                     CoordInicio[1] = Json.parse(in.getContent()).asObject().get("Y").asInt();
                     altura_max = Json.parse(in.getContent()).asObject().get("altura_max").asInt();
                     myName = Json.parse(in.getContent()).asObject().get("nombre").asString();
-                   
-                    
+
                     myStatus = "SUBSCRIBE-WM";
                 }
                 break;
@@ -142,7 +140,7 @@ public class Rescuer extends Drone {
             case "SHOPPING":
                 //Esperamos a que Pantoja abra las rebajas
                 in = blockingReceive();
-            
+
                 if (updateShops()) {
                     //Algoritmo que gestiona las compras
                     comprar(myWishlist);
@@ -150,11 +148,10 @@ public class Rescuer extends Drone {
 
                 //avisar de que he terminado mis compras
                 sendFinCompra();
-                
+
                 myStatus = "LOGIN-PROBLEM";
                 break;
 
-                
             case "LOGIN-PROBLEM":
                 in = blockingReceive();
                 try {
@@ -167,9 +164,9 @@ public class Rescuer extends Drone {
                 //Inicializamos los sensores del dron
                 inicializarSensores(myMap);
                 //Pasamos los sensores y las coordenadas de inicio al WM
-                
+
                 in = sendLoginProblem();
-                
+
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
                     Info(ACLMessage.getPerformative(in.getPerformative())
@@ -180,34 +177,43 @@ public class Rescuer extends Drone {
                 }
                 //Guardar la energia inicial
                 energy = 10;
-                
-                
+
                 myStatus = "WAITING-TARGET";
                 break;
-                
+
             case "WAITING-TARGET":
-                Info("WAIING TARGET");
+                Info("WAITING TARGET");
                 in = blockingReceive();
-                
-                if(in.getPerformative() == ACLMessage.REQUEST){
+
+                if (in.getPerformative() == ACLMessage.REQUEST) {
                     this.myPartner = Json.parse(in.getContent()).asObject().get("emisor").asString();
                     this.destinox = Json.parse(in.getContent()).asObject().get("posx").asInt();
-                    this.destinoy = Json.parse(in.getContent()).asObject().get("posx").asInt();
+                    this.destinoy = Json.parse(in.getContent()).asObject().get("posy").asInt();
                     Info("Recibidas coordenadas de: " + this.myPartner);
+                    Info("Coordenadas: " + destinox + ", " + destinoy);
                     myStatus = "RESCUING";
                 }
                 break;
-                
+
             case "RESCUING":
                 recarga();
                 energy = 1000;
-                
-                irA(destinox,destinoy);
-                
+
+                irA(destinox, destinoy);
+
                 rescatar();
                 sendRescued();
+                in = sendAction("moveUP");
+                recarga();
+                energy = 1000;
+
+                irA(CoordInicio[0], CoordInicio[1]);
+                readSensores();
                 
-                irA(CoordInicio[0],CoordInicio[1]);
+                rescatar();
+                
+                myStatus = "WAITING-TARGET";
+
                 break;
 
             case "CHECKOUT-LARVA":
@@ -225,26 +231,27 @@ public class Rescuer extends Drone {
 
         }
     }
+    
 
     private void rescatar() {
         int aux = altimeter;
         int aux2 = energy;
         ArrayList<String> rescate = new ArrayList<>();
-        
+
         for (int i = 0; i < aux / 5; i++) {
-            if(aux > 0){
+            if (aux > 0) {
                 rescate.add("moveD");
             }
         }
         rescate.add("touchD");
         rescate.add("rescue");
 
-        if(energy_u > energy - coste(rescate)){
+        if (energy_u > energy - coste(rescate)) {
             recarga();
             energy = 1000;
         }
-        
-        for(String r : rescate){
+
+        for (String r : rescate) {
             in = sendAction(r);
         }
         energy -= coste(rescate);
@@ -259,7 +266,7 @@ public class Rescuer extends Drone {
         outRescueTeam.setConversationId(myConvID);
         outRescueTeam.setProtocol("REGULAR");
         outRescueTeam.setPerformative(ACLMessage.INFORM);
-        
+
         this.send(outRescueTeam);
     }
 

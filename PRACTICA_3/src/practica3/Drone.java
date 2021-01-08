@@ -102,7 +102,7 @@ public abstract class Drone extends IntegratedAgent {
         myYP = new YellowPages();
         
         //Problem
-        myProblem = "World1";
+        myProblem = "PlayGround1";
         myMap = new Map2DGrayscale();
         
         //Panel de control
@@ -303,9 +303,9 @@ public abstract class Drone extends IntegratedAgent {
                     
                 } else {
                     String producto = Json.parse(in.getContent()).asObject().get("reference").asString();
-                    //Info("producto: " +  producto);
+                    
                     if(producto.contains("CHARGE")){
-                       // Info("Meto el charge: "+producto);
+                       
                         this.myCharges.push(producto);
                     }
                     else{
@@ -316,7 +316,6 @@ public abstract class Drone extends IntegratedAgent {
 
 //            }
         }
-        //Info("Hemos comprado " + myCharges.size() + " cargas");
     }
 
     protected ACLMessage sendComprar(String producto, String tienda, int precio) {
@@ -467,14 +466,13 @@ public abstract class Drone extends IntegratedAgent {
         
         
         String answer = in.getContent();
-        Info("************************" + in.toString());
         json = Json.parse(answer).asObject();
-        out = in.createReply();
-
-        //Info("La lectora de sensores es: " + answer);
-        //myControlPanel.feedData(in, myMap.getWidth(), myMap.getHeight(), myMap.getMaxHeight());
-        //myControlPanel.fancyShow();
-        //myControlPanel.fancyShowMicro();
+        
+        if(!answer.contains("perceptions")){
+            in = this.blockingReceive();
+            answer = in.getContent();
+            json = Json.parse(answer).asObject();
+        }
 
         //Actualizacion de los sensores 
         for (JsonValue j : json.get("details").asObject().get("perceptions").asArray()) {
@@ -503,7 +501,6 @@ public abstract class Drone extends IntegratedAgent {
                     break;
                 case ("distance"):
                     distance = j.asObject().get("data").asArray().get(0).asDouble();
-                    //Info("Distancia: " + distance);
                     break;
                 case ("energy"):
                     energy = j.asObject().get("data").asArray().get(0).asInt();
@@ -547,18 +544,14 @@ public abstract class Drone extends IntegratedAgent {
     }
     
     protected boolean elevar() {
-       Info("Bateria antes de elevar: "+ energy);
         while (position[2] < this.altura_max) {
-            Info("Subiendo");
             if (energy_u > (energy - 5)) {
                 Info("No tengo bateria para elevar, recargo");
                 if(!recarga()){
                     return false;
                 }
             }
-            else{
-                Info("Tengo bateria suficiente para seguir elevando: "+energy);
-            }
+            
             position[2] += 5;
             
             in = sendAction("moveUP");
@@ -577,12 +570,15 @@ public abstract class Drone extends IntegratedAgent {
     }
 
     protected ACLMessage sendAction(String accion){
+        out = new ACLMessage();
         JsonObject contenido = new JsonObject();
         contenido.add("operation", accion);
         out.setContent(contenido.toString());
         out.setConversationId(myConvID);
         out.setProtocol("REGULAR");
         out.setPerformative(ACLMessage.REQUEST);
+        out.addReceiver(new AID(myWorldManager, AID.ISLOCALNAME));
+        out.setSender(this.getAID());
         
         this.send(out);
         return this.blockingReceive();
@@ -594,10 +590,7 @@ public abstract class Drone extends IntegratedAgent {
             comprarCharges.add("CHARGE");
             comprar(comprarCharges);
         }
-        //Bajar hasta altimetro = 5
-        //readSensores();
-        Info("Bateria antes de empezar a recargar " + energy);
-        Info("Bajamos " + altimeter/5 + " veces");
+
         Info("Recargando...");
         int aux = altimeter;
         int aux2 = energy;
@@ -605,8 +598,6 @@ public abstract class Drone extends IntegratedAgent {
         
         for (int i = 0; i < aux / 5; i++) {
             if(aux > 0){
-                Info("BATERIA: " + energy);
-                Info("BATERIA AUX : " + aux2 + "BATERIA: " + energy);
                 in = sendAction("moveD");
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
@@ -619,8 +610,7 @@ public abstract class Drone extends IntegratedAgent {
                 //energy -= 5;
             }
         }
-        Info("Hemos bajado");
-        //Aterrizar (touchD)
+        
         in = sendAction("touchD");
         myError = (in.getPerformative() != ACLMessage.INFORM);
         if (myError) {
@@ -629,13 +619,9 @@ public abstract class Drone extends IntegratedAgent {
                     + " debido a " + getDetailsLARVA(in));
             return false;
         }
-        //Restamos bateria manualmente
-        //energy -= 5;
-        //Info("Bateria despues de aterrizar: " + energy);
         
         
         //recharge
-        Info("Recarga bateria");
         in = sendRecharge();
 
         myError = (in.getPerformative() != ACLMessage.INFORM);
@@ -645,16 +631,14 @@ public abstract class Drone extends IntegratedAgent {
                     + " debido a " + getDetailsLARVA(in));
             return false;
         }
-        //actualizamos manualmente la energia
-        //energy = 1000;
-        //Info("Bateria despues de recargar: " + energy);
-
-        
 
         return true;
     }
     
     protected ACLMessage sendRecharge(){
+        out = new ACLMessage();
+        out.addReceiver(new AID(myWorldManager, AID.ISLOCALNAME));
+        out.setSender(this.getAID());
         JsonObject contenido = new JsonObject();
         contenido.add("operation", "recharge");
         contenido.add("recharge", (String) myCharges.pop());
@@ -848,9 +832,6 @@ public abstract class Drone extends IntegratedAgent {
                   }
                 
                 //Mirar la altura de la casilla
-                //Info("La altura de la casilla es " + altura);
-                //Info("La altura máxima de vuelo es: " + maxflight);
-                //Info("La altura del agente antes de las acciones es: " + position[2]);
                 diferenciaAltura = position[2] - (altura + 1);
                 if( Math.abs(diferenciaAltura/5) < 1){
                     acciones.add("moveF");
