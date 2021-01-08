@@ -37,6 +37,7 @@ public abstract class Drone extends IntegratedAgent {
 
     protected int[] CoordInicio = new int[2];
     protected int altura_max = 0; //Comun a todos los mapas
+    protected String myName;
 
     //Tiendas disponibles en el mundo
     protected HashMap<String, Integer> tienda0 = new HashMap<String, Integer>();
@@ -186,10 +187,10 @@ public abstract class Drone extends IntegratedAgent {
         //Por cada elemento de la lista de deseos
         for (String elemento : miLista) {
             boolean compraCarga = true;
-            while (compraCarga) {
-                if (!elemento.equals("CHARGE")) {
-                    compraCarga = false;
-                }
+            //while (compraCarga) {
+                //if (!elemento.equals("CHARGE")) {
+//                    compraCarga = false;
+//                }
                 //Actualizamos las tiendas
                 updateShops();
                 String eleccionTienda0 = "";
@@ -313,9 +314,9 @@ public abstract class Drone extends IntegratedAgent {
                     auxCoins = new Stack();
                 }
 
-            }
+//            }
         }
-        Info("Hemos comprado " + myCharges.size() + " cargas");
+        //Info("Hemos comprado " + myCharges.size() + " cargas");
     }
 
     protected ACLMessage sendComprar(String producto, String tienda, int precio) {
@@ -450,19 +451,23 @@ public abstract class Drone extends IntegratedAgent {
     }
     
     protected void readSensores() {
-        out = in.createReply();
+        out = new ACLMessage();
         JsonObject json = new JsonObject();
         json.add("operation", "read");
         String resultado = json.toString();
         out.setConversationId(myConvID);
+        out.setSender(this.getAID());
+        out.addReceiver(new AID(myWorldManager, AID.ISLOCALNAME));
         out.setContent(resultado);
         out.setProtocol("REGULAR");
         out.setPerformative(ACLMessage.QUERY_REF);
         this.send(out);
 
         in = this.blockingReceive();
+        
+        
         String answer = in.getContent();
-        Info(answer);
+        Info("************************" + in.toString());
         json = Json.parse(answer).asObject();
         out = in.createReply();
 
@@ -584,6 +589,11 @@ public abstract class Drone extends IntegratedAgent {
     }
     
     protected boolean recarga(){
+        if(myCharges.isEmpty()){
+            ArrayList<String> comprarCharges = new ArrayList<>();
+            comprarCharges.add("CHARGE");
+            comprar(comprarCharges);
+        }
         //Bajar hasta altimetro = 5
         //readSensores();
         Info("Bateria antes de empezar a recargar " + energy);
@@ -611,7 +621,7 @@ public abstract class Drone extends IntegratedAgent {
         }
         Info("Hemos bajado");
         //Aterrizar (touchD)
-        sendAction("touchD");
+        in = sendAction("touchD");
         myError = (in.getPerformative() != ACLMessage.INFORM);
         if (myError) {
             Info(ACLMessage.getPerformative(in.getPerformative())
@@ -657,7 +667,7 @@ public abstract class Drone extends IntegratedAgent {
         return this.blockingReceive();
     }
     
-    protected ACLMessage sendFinCompra(){
+    protected void sendFinCompra(){
         ACLMessage outPantoja = new ACLMessage();
         outPantoja.setSender(this.getAID());
         outPantoja = new ACLMessage();
@@ -666,7 +676,7 @@ public abstract class Drone extends IntegratedAgent {
         outPantoja.setProtocol("REGULAR");
         
         this.send(outPantoja);
-        return this.blockingReceive();
+        
     }
     
     
@@ -878,19 +888,9 @@ public abstract class Drone extends IntegratedAgent {
             //Calculamos el angulo segun el destino
             here = new Point(position[0], position[1]);
             distancia = here.fastDistanceXYTo(orig);
-            
-            Info("Distancia -> " + distancia);
              
             angulo = Compass.VECTOR[Compass.NORTH].angleXYTo(new Vector(here,orig));
-            /*Info("Angulo antes del if: " + angulo);
-            if(angulo >= 270){
-                angulo = -(angulo - 360) + 90;
-                   Info("Angulo era >= 270, ahora es-> " + angulo);
-            }else{
-                angulo = -angulo + 90;
-                Info("Angulo era < 270, ahora es-> " + angulo);
-            }*/
-            Info("ANGULOOOOO-> " + angulo);
+            
             //Calculamos la casilla segun el angulo obtenido
             if(angulo >= (-45 - 22.5) && angulo < (-45 + 22.5)){
                 anguloCasilla = -45;
@@ -944,10 +944,8 @@ public abstract class Drone extends IntegratedAgent {
                 energy -= coste(actions);
             }
             
-            Info("AAAAAAAAAAAAAAA");
             //Para cada accion, enviar mensaje al servidor
             for(String a : actions){
-                Info("Accion: " + a);
                 in = sendAction(a);
             }
             //Actualizar sensores

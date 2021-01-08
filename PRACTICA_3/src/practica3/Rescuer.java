@@ -84,7 +84,9 @@ public class Rescuer extends Drone {
                     Info("Contenido: " + in.getContent());
                     CoordInicio[0] = Json.parse(in.getContent()).asObject().get("X").asInt();
                     CoordInicio[1] = Json.parse(in.getContent()).asObject().get("Y").asInt();
-                    
+                    altura_max = Json.parse(in.getContent()).asObject().get("altura_max").asInt();
+                    myName = Json.parse(in.getContent()).asObject().get("nombre").asString();
+                   
                     
                     myStatus = "SUBSCRIBE-WM";
                 }
@@ -147,14 +149,14 @@ public class Rescuer extends Drone {
                 }
 
                 //avisar de que he terminado mis compras
-                in = sendFinCompra();
+                sendFinCompra();
                 
                 myStatus = "LOGIN-PROBLEM";
                 break;
 
                 
             case "LOGIN-PROBLEM":
-                
+                in = blockingReceive();
                 try {
                     //Cargar el mapa
                     Info("Cargando mapa...");
@@ -184,10 +186,11 @@ public class Rescuer extends Drone {
                 break;
                 
             case "WAITING-TARGET":
+                Info("WAIING TARGET");
                 in = blockingReceive();
                 
                 if(in.getPerformative() == ACLMessage.REQUEST){
-                    this.myPartner = in.getSender().toString();
+                    this.myPartner = Json.parse(in.getContent()).asObject().get("emisor").asString();
                     this.destinox = Json.parse(in.getContent()).asObject().get("posx").asInt();
                     this.destinoy = Json.parse(in.getContent()).asObject().get("posx").asInt();
                     Info("Recibidas coordenadas de: " + this.myPartner);

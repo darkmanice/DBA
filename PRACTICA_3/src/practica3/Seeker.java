@@ -84,7 +84,8 @@ public class Seeker extends Drone{
                     CoordInicio[0] = Json.parse(in.getContent()).asObject().get("X").asInt();
                     CoordInicio[1] = Json.parse(in.getContent()).asObject().get("Y").asInt();
                     altura_max = Json.parse(in.getContent()).asObject().get("altura_max").asInt();
-                    
+                    myName = Json.parse(in.getContent()).asObject().get("nombre").asString();
+                   
                     myStatus = "SUBSCRIBE-WM";
                 }
                 break;
@@ -146,13 +147,14 @@ public class Seeker extends Drone{
             
             
                 //avisar de que he terminado mis compras
-                in = sendFinCompra();
+                sendFinCompra();
 
                 myStatus = "LOGIN-PROBLEM";
                 break;
 
                 
             case "LOGIN-PROBLEM":
+                in = blockingReceive();
                 
             
                 try {
@@ -179,7 +181,7 @@ public class Seeker extends Drone{
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
-                
+                Info("Vamos a recargar");
                 //Se ha logueado correctamente, valores de inicio
                 energy = 10;
                 //Recargamos, estamos a la altura del suelo
@@ -241,10 +243,21 @@ public class Seeker extends Drone{
                 break;
 
             case "WAITING-RESCUER":
+                Info("WAITING RESCUERRRR");
+                //Elevamos dos veces al agente
+                if(energy_u > energy - 20){
+                   recarga(); 
+                }
+                in = sendAction("moveUP");
+                in = sendAction("moveUP");
+                
                 in = blockingReceive();
+                Info("WAITIGN RESCUER MENSAJE: " + in.toString());
+               
                 if (in.getPerformative() == ACLMessage.INFORM) {
                     myStatus = "SEEKING";
                 }
+                
                 break;
                 
             case "CHECKOUT-LARVA":
@@ -288,8 +301,8 @@ public class Seeker extends Drone{
                 sendSearchPoint("Ramon");
             }
             //Elevar al Seeker y ponerlo a esperar una respuesta de su rescuer
-            acciones.add("moveUP");
-            acciones.add("moveUP");
+            //acciones.add("moveUP");
+            //acciones.add("moveUP");
             
             if (energy_u > (energy - 2*coste(acciones))){
                 //Recargamos energia 
@@ -297,7 +310,7 @@ public class Seeker extends Drone{
             }
             
             myStatus = "WAITING-RESCUER";
-            return acciones;
+            return new ArrayList<>();
             
             //Lo mandamos al lado contrario del que estamos
             /*if(position[0] <= myMap.getWidth() / 2){
@@ -391,6 +404,7 @@ public class Seeker extends Drone{
         JsonObject contenido = new JsonObject();
         contenido.add("posx", position[0]);
         contenido.add("posy", position[1]);
+        contenido.add("emisor", myName);
         outRecueTeam.setSender(getAID());
         outRecueTeam.addReceiver(new AID(agent, AID.ISLOCALNAME));
         outRecueTeam.setContent(contenido.toString());

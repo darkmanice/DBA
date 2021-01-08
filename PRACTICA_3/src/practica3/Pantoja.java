@@ -157,6 +157,7 @@ public class Pantoja extends IntegratedAgent {
                 contenido.add("X", coordx);
                 contenido.add("Y", coordy);
                 contenido.add("altura_max", 255);
+                contenido.add("nombre", "Cajal");
                 mandarConvId("Cajal", contenido.toString());
                 
                 //Seeker2
@@ -167,6 +168,7 @@ public class Pantoja extends IntegratedAgent {
                 contenido.add("X", coordx);
                 contenido.add("Y", coordy);
                 contenido.add("altura_max",255);
+                contenido.add("nombre", "Ramon");
                 mandarConvId("Ramon", contenido.toString());
                 
                 
@@ -193,6 +195,10 @@ public class Pantoja extends IntegratedAgent {
                 
                 //2.Ramon (Rescuer) puede comprar
                 in = sendPuedesComprar("Ramon");
+                
+                
+                sendLoginProblem("Ramon");
+                sendLoginProblem("Cajal");
                 
                 myStatus = "WAITING";
                 break;
@@ -357,5 +363,16 @@ public class Pantoja extends IntegratedAgent {
         out.setPerformative(ACLMessage.REQUEST);
         send(out);
         return this.blockingReceive();
+    }
+
+    private void sendLoginProblem(String agent) {
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID(agent, AID.ISLOCALNAME));
+        out.setContent("");
+        out.setConversationId(myConvID);
+        out.setProtocol("REGULAR");
+        out.setPerformative(ACLMessage.REQUEST);
+        send(out);
     }
 }
