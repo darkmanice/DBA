@@ -7,6 +7,9 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
 import ControlPanel.TTYControlPanel;
+import Geometry.Point;
+import Geometry.Vector;
+import World.Compass;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -61,11 +64,11 @@ public abstract class Drone extends IntegratedAgent {
     
     
     //Variables para conteo de la memoria del dron
-    private int iterador = 0;
+    protected int iterador = 0;
     private int umbral_k = 800;
     
     //Umbral para recargar la batería
-    protected int energy_u = 250; 
+    protected int energy_u = 50; 
     
     @Override
     public void setup() {
@@ -312,6 +315,7 @@ public abstract class Drone extends IntegratedAgent {
 
             }
         }
+        Info("Hemos comprado " + myCharges.size() + " cargas");
     }
 
     protected ACLMessage sendComprar(String producto, String tienda, int precio) {
@@ -463,8 +467,8 @@ public abstract class Drone extends IntegratedAgent {
         out = in.createReply();
 
         //Info("La lectora de sensores es: " + answer);
-        myControlPanel.feedData(in, myMap.getWidth(), myMap.getHeight(), myMap.getMaxHeight());
-        myControlPanel.fancyShow();
+        //myControlPanel.feedData(in, myMap.getWidth(), myMap.getHeight(), myMap.getMaxHeight());
+        //myControlPanel.fancyShow();
         //myControlPanel.fancyShowMicro();
 
         //Actualizacion de los sensores 
@@ -581,12 +585,13 @@ public abstract class Drone extends IntegratedAgent {
     
     protected boolean recarga(){
         //Bajar hasta altimetro = 5
+        //readSensores();
         Info("Bateria antes de empezar a recargar " + energy);
         Info("Bajamos " + altimeter/5 + " veces");
         Info("Recargando...");
         int aux = altimeter;
         int aux2 = energy;
-        readSensores();
+        
         
         for (int i = 0; i < aux / 5; i++) {
             if(aux > 0){
@@ -601,7 +606,7 @@ public abstract class Drone extends IntegratedAgent {
                     return false;
                 }
                 //Restamos bateria manualmente
-                energy -= 5;
+                //energy -= 5;
             }
         }
         Info("Hemos bajado");
@@ -615,8 +620,8 @@ public abstract class Drone extends IntegratedAgent {
             return false;
         }
         //Restamos bateria manualmente
-        energy -= 5;
-        Info("Bateria despues de aterrizar: " + energy);
+        //energy -= 5;
+        //Info("Bateria despues de aterrizar: " + energy);
         
         
         //recharge
@@ -631,8 +636,8 @@ public abstract class Drone extends IntegratedAgent {
             return false;
         }
         //actualizamos manualmente la energia
-        energy = 1000;
-        Info("Bateria despues de recargar: " + energy);
+        //energy = 1000;
+        //Info("Bateria despues de recargar: " + energy);
 
         
 
@@ -649,6 +654,18 @@ public abstract class Drone extends IntegratedAgent {
         out.setPerformative(ACLMessage.REQUEST);
         
         this.send(out);
+        return this.blockingReceive();
+    }
+    
+    protected ACLMessage sendFinCompra(){
+        ACLMessage outPantoja = new ACLMessage();
+        outPantoja.setSender(this.getAID());
+        outPantoja = new ACLMessage();
+        outPantoja.setContent("");
+        outPantoja.addReceiver(new AID("Pantoja", AID.ISLOCALNAME));
+        outPantoja.setProtocol("REGULAR");
+        
+        this.send(outPantoja);
         return this.blockingReceive();
     }
     
@@ -788,39 +805,61 @@ public abstract class Drone extends IntegratedAgent {
         }
     }
 
-    protected ArrayList<String> calculaGiroySubida(double angulo) {
+    protected ArrayList<String> calculaGiroySubida(double angulo, int altura) {
         ArrayList<String> acciones = new ArrayList<>();
         int anguloCasilla;
         double direccionGiro;
-        int ngirosD = 0;
-        int ngirosI = 0;
-        int anguloAux = (compass + 360) % 360;
+        int ngirosD=0;
+        int ngirosI=0;
+        int anguloAux = (compass+360)%360;
         int diferenciaAltura;
         //calcular cuanto tiene que girar
-        while (anguloAux != (angulo + 360) % 360) {
-            ngirosD++;
-            anguloAux = (anguloAux + 45) % 360;
-        }
-
-        anguloAux = (compass + 360) % 360;
-
-        while (anguloAux != (angulo + 360) % 360) {
-            ngirosI++;
-            anguloAux = (anguloAux - 45 + 360) % 360;
-        }
-
-        if (ngirosD < ngirosI) {
-            for (int i = 0; i < ngirosD; i++) {
-                acciones.add("rotateR");
-            }
-        } else {
-            for (int i = 0; i < ngirosI; i++) {
-                acciones.add("rotateL");
-            }
-        }
-
-        acciones.add("moveF");
-
+                  while( anguloAux != (angulo+360)%360 ){
+                      ngirosD++;
+                      anguloAux = (anguloAux+45)%360;
+                  }
+                  
+                  anguloAux = (compass+360)%360;
+                  
+                  while( anguloAux != (angulo+360)%360 ){
+                      ngirosI++;
+                      anguloAux = (anguloAux-45+360)%360;
+                  }
+                  
+                  if(ngirosD < ngirosI){
+                      for(int i = 0; i < ngirosD; i++){
+                          acciones.add("rotateR");
+                      }
+                  }
+                  else{
+                      for(int i = 0; i < ngirosI; i++){
+                          acciones.add("rotateL");
+                      }
+                  }
+                
+                //Mirar la altura de la casilla
+                //Info("La altura de la casilla es " + altura);
+                //Info("La altura máxima de vuelo es: " + maxflight);
+                //Info("La altura del agente antes de las acciones es: " + position[2]);
+                diferenciaAltura = position[2] - (altura + 1);
+                if( Math.abs(diferenciaAltura/5) < 1){
+                    acciones.add("moveF");
+                }
+                for(int i = 0; i < Math.abs(diferenciaAltura/5); i++){
+                    if(diferenciaAltura >= 0){
+                        //Baja
+                        if(i == 0)
+                            acciones.add("moveF");
+                        acciones.add("moveD");
+                    } else {
+                        //Sube 
+                        acciones.add("moveUP");
+                        if(i == (Math.abs(diferenciaAltura/5) - 1))
+                            acciones.add("moveF");
+                    }
+                }
+                
+        
         return acciones;
     }
     //(-angulo + 90) si es -180 pasarlo a 180
@@ -829,32 +868,91 @@ public abstract class Drone extends IntegratedAgent {
         double angulo;
         ArrayList<String> actions = new ArrayList<>();
         
+        int anguloCasilla;
+        Point orig = new Point(destinox,destinoy);
+        Point here;
+        
         //Leer sensores por primera vez
         readSensores();
         do{
             //Calculamos el angulo segun el destino
-            distancia = Math.sqrt(Math.pow(destinox-position[0],2) + Math.pow(destinoy-position[1],2));
-            angulo = Math.toDegrees(Math.asin(-1*(destinoy - position[1])/distancia)) % 360;
+            here = new Point(position[0], position[1]);
+            distancia = here.fastDistanceXYTo(orig);
+            
+            Info("Distancia -> " + distancia);
+             
+            angulo = Compass.VECTOR[Compass.NORTH].angleXYTo(new Vector(here,orig));
+            /*Info("Angulo antes del if: " + angulo);
             if(angulo >= 270){
                 angulo = -(angulo - 360) + 90;
+                   Info("Angulo era >= 270, ahora es-> " + angulo);
             }else{
                 angulo = -angulo + 90;
+                Info("Angulo era < 270, ahora es-> " + angulo);
+            }*/
+            Info("ANGULOOOOO-> " + angulo);
+            //Calculamos la casilla segun el angulo obtenido
+            if(angulo >= (-45 - 22.5) && angulo < (-45 + 22.5)){
+                anguloCasilla = -45;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]-1)); 
             }
-            actions = calculaGiroySubida(angulo);
+            if(angulo >= (0 - 22.5) && angulo < (45 - 22.5)){
+                anguloCasilla = 0;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1]-1));
+            }
+            if(angulo >= (45 - 22.5) && angulo < (90 - 22.5)){
+                anguloCasilla = 45;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]-1));
+            }
+            if(angulo >= (90 - 22.5) && angulo < (135 - 22.5)){
+                anguloCasilla = 90;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]));  
+            }
+            if(angulo >= (135 - 22.5) && angulo < (180 - 22.5)){
+                anguloCasilla = 135;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]+1));
+            }
+            if(angulo >= (180 - 22.5) && angulo < (-135 - 22.5)){
+                anguloCasilla = 180;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1]+1));
+            }
+            if(angulo < (-135 + 22.5) && angulo >= (-135 - 22.5)){
+                anguloCasilla = -135;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]+1));
+            }
+            if(angulo >= (-90 - 22.5) && angulo < (-90 + 22.5)){
+                anguloCasilla = -90;
+                //Calculamos cuanto tiene que girar, subir o bajar
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]));  
+            }
             
             //Mirar si hay que recarga batería antes de realizar las acciones
             if (energy_u > (energy - coste(actions) - altimeter)){
                 //Recargamos energia y volvemos a subir
                 recarga();
-                elevar();
+                energy = 1000;
+               // elevar();
+            }
+            else{
+                energy -= coste(actions);
             }
             
+            Info("AAAAAAAAAAAAAAA");
             //Para cada accion, enviar mensaje al servidor
             for(String a : actions){
+                Info("Accion: " + a);
                 in = sendAction(a);
             }
             //Actualizar sensores
             readSensores();
+            energy -= mySensors.size();
         }while(position[0] != destinox || position[1] != destinoy);
         
 

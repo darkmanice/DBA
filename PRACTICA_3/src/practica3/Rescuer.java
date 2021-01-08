@@ -7,7 +7,9 @@ package practica3;
 
 import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
 import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,17 +22,18 @@ import java.util.logging.Logger;
  */
 public class Rescuer extends Drone {
     
+    private String myPartner;
+    private int destinox;
+    private int destinoy;
+    
     @Override
     public void setup(){
         super.setup();
         
         //Lista de articulos deseados
-        myWishlist.add("LIDAR");
-        myWishlist.add("ANGULAR");
-        myWishlist.add("VISUAL");
+        myWishlist.add("GPS");
         myWishlist.add("COMPASS");
-        myWishlist.add("THERMAL");
-        myWishlist.add("ALIVE");
+
     }
 
     @Override
@@ -135,14 +138,20 @@ public class Rescuer extends Drone {
                 break;
 
             case "SHOPPING":
-
+                //Esperamos a que Pantoja abra las rebajas
+                in = blockingReceive();
+            
                 if (updateShops()) {
                     //Algoritmo que gestiona las compras
                     comprar(myWishlist);
                 }
 
+                //avisar de que he terminado mis compras
+                in = sendFinCompra();
+                
                 myStatus = "LOGIN-PROBLEM";
                 break;
+
                 
             case "LOGIN-PROBLEM":
                 
@@ -167,8 +176,35 @@ public class Rescuer extends Drone {
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
-                        
-                myStatus = "CHECKOUT-LARVA";
+                //Guardar la energia inicial
+                energy = 10;
+                
+                
+                myStatus = "WAITING-TARGET";
+                break;
+                
+            case "WAITING-TARGET":
+                in = blockingReceive();
+                
+                if(in.getPerformative() == ACLMessage.REQUEST){
+                    this.myPartner = in.getSender().toString();
+                    this.destinox = Json.parse(in.getContent()).asObject().get("posx").asInt();
+                    this.destinoy = Json.parse(in.getContent()).asObject().get("posx").asInt();
+                    Info("Recibidas coordenadas de: " + this.myPartner);
+                    myStatus = "RESCUING";
+                }
+                break;
+                
+            case "RESCUING":
+                recarga();
+                energy = 1000;
+                
+                irA(destinox,destinoy);
+                
+                rescatar();
+                sendRescued();
+                
+                irA(CoordInicio[0],CoordInicio[1]);
                 break;
 
             case "CHECKOUT-LARVA":
@@ -185,6 +221,43 @@ public class Rescuer extends Drone {
                 break;
 
         }
+    }
+
+    private void rescatar() {
+        int aux = altimeter;
+        int aux2 = energy;
+        ArrayList<String> rescate = new ArrayList<>();
+        
+        for (int i = 0; i < aux / 5; i++) {
+            if(aux > 0){
+                rescate.add("moveD");
+            }
+        }
+        rescate.add("touchD");
+        rescate.add("rescue");
+
+        if(energy_u > energy - coste(rescate)){
+            recarga();
+            energy = 1000;
+        }
+        
+        for(String r : rescate){
+            in = sendAction(r);
+        }
+        energy -= coste(rescate);
+        Info("GERETTET !!!");
+    }
+
+    private void sendRescued() {
+        ACLMessage outRescueTeam = new ACLMessage();
+        outRescueTeam.setSender(this.getAID());
+        outRescueTeam.addReceiver(new AID(myPartner, AID.ISLOCALNAME));
+        outRescueTeam.setContent("");
+        outRescueTeam.setConversationId(myConvID);
+        outRescueTeam.setProtocol("REGULAR");
+        outRescueTeam.setPerformative(ACLMessage.INFORM);
+        
+        this.send(outRescueTeam);
     }
 
 }

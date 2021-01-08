@@ -137,14 +137,20 @@ public class Seeker extends Drone{
                 break;
 
             case "SHOPPING":
-
+                //Esperamos a que Pantoja abra las rebajas
+                in = blockingReceive();
                 if (updateShops()) {
                     //Algoritmo que gestiona las compras
                     comprar(myWishlist);
                 }
+            
+            
+                //avisar de que he terminado mis compras
+                in = sendFinCompra();
 
                 myStatus = "LOGIN-PROBLEM";
                 break;
+
                 
             case "LOGIN-PROBLEM":
                 
@@ -173,6 +179,19 @@ public class Seeker extends Drone{
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
+                
+                //Se ha logueado correctamente, valores de inicio
+                energy = 10;
+                //Recargamos, estamos a la altura del suelo
+                in = sendRecharge();
+                 myError = (in.getPerformative() != ACLMessage.INFORM);
+                if (myError) {
+                    Info(ACLMessage.getPerformative(in.getPerformative())
+                            + " No se pudo hacer primer recharge en el problema con " + this.myWorldManager
+                            + " debido a " + getDetailsLARVA(in));
+                    myStatus = "CHECKOUT-LARVA";
+                    break;
+                }
                         
                 myStatus = "SEEKING";
                 break;
@@ -180,7 +199,7 @@ public class Seeker extends Drone{
                 
             case "SEEKING":
                 
-                //Leer los sensores
+               /* //Leer los sensores
                 readSensores();
                 Info("Bateria despues de leer sensores: " + energy);
                 
@@ -204,10 +223,30 @@ public class Seeker extends Drone{
                 }
              
                 
-                //myStatus = "SEEKING";
+                //myStatus = "SEEKING";*/
+                //**************************************************
+                //Incrementamos el iterador
+                iterador++;
+                //Leer los sensores
+                readSensores();
                 
+                //Calcular acciones posibles
+                ArrayList<String> acciones = calcularAccionesPosibles();
+                
+                //Para cada una de las acciones, enviar mensajes al servidor
+                for(int i = 0; i<acciones.size(); i++){
+                        in = sendAction(acciones.get(i));
+                        myStatus ="SEEKING";
+                }
                 break;
 
+            case "WAITING-RESCUER":
+                in = blockingReceive();
+                if (in.getPerformative() == ACLMessage.INFORM) {
+                    myStatus = "SEEKING";
+                }
+                break;
+                
             case "CHECKOUT-LARVA":
                 //TODO: Mandar mensaje al coach de que me voy
                 Info("Haciendo checkout de LARVA en" + _identitymanager);
@@ -237,20 +276,31 @@ public class Seeker extends Drone{
         //Miramos si estamos encima del objetivo
         if (distance == 0){
             Info("Target encontrado en: (" + position[0] + "," + position[1] + ")");
-            
+           
             //comunicar al rescuer la posicion del aleman
             if(position[1] <= myMap.getHeight()/2 ){
                 //El target esta en la mitad superior y lo comunica al agente correspondiente -> Ramon
-                Info("Enviando coordenadas a Ramon");
-                sendSearchPoint("Ramon");
-            }
-            else{
                 Info("Enviando coordenadas a Ortega");
                 //sendSearchPoint("Ortega");
             }
+            else{
+                Info("Enviando coordenadas a Ramon");
+                sendSearchPoint("Ramon");
+            }
+            //Elevar al Seeker y ponerlo a esperar una respuesta de su rescuer
+            acciones.add("moveUP");
+            acciones.add("moveUP");
+            
+            if (energy_u > (energy - 2*coste(acciones))){
+                //Recargamos energia 
+                recarga();
+            }
+            
+            myStatus = "WAITING-RESCUER";
+            return acciones;
             
             //Lo mandamos al lado contrario del que estamos
-            if(position[0] <= myMap.getWidth() / 2){
+            /*if(position[0] <= myMap.getWidth() / 2){
                 //Esta a la izq, lo mandamos a la derecha
                 irA(position[0]+myMap.getWidth()/2, position[1]);
                 //Volvemos a calcular las acciones posibles para el siguiente objetivo
@@ -261,7 +311,7 @@ public class Seeker extends Drone{
                 irA(position[0]-myMap.getWidth()/2, position[1]);
                 //Volvemos a calcular las acciones posibles para el siguiente objetivo
                 return calcularAccionesPosibles(); 
-            }
+            }*/
         }
         
         //En orden, mirar que se pueda ir a la siguiente casilla
@@ -278,43 +328,43 @@ public class Seeker extends Drone{
             case "NO":
                 anguloCasilla = -45;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]-1));
                 
                 break;
             case "N":
                 anguloCasilla = 0;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1]-1));
                 break;
             case "NE":
                 anguloCasilla = 45;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]-1));
                 break;
             case "E":
                 anguloCasilla = 90;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]));
                 break;
             case "SE":
                 anguloCasilla = 135;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]+1));
                 break;
             case "S":
                 anguloCasilla = 180;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1]+1));
                 break;
             case "SO":
                 anguloCasilla = -135;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]+1));
                 break;
             case "O":
                 anguloCasilla = -90;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla);
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]));
                 break;
         }
         
@@ -323,12 +373,12 @@ public class Seeker extends Drone{
             Info("Acciones: "+ acciones.get(i));
         }
         
-        
-        if (energy_u > (energy - coste(acciones) - altimeter)){
-            Info("NO TENGO SUFICIENTE ENERGIA. Umbral: " + energy_u + " Energia actual: " + energy + " coste acciones: " + coste(acciones) + " altimetro: " +altimeter);
+        //Hemos quitado -altimeter
+        if (energy_u > (energy - coste(acciones))){
+            //Info("NO TENGO SUFICIENTE ENERGIA. Umbral: " + energy_u + " Energia actual: " + energy + " coste acciones: " + coste(acciones) + " altimetro: " +altimeter);
             //Recargamos energia y volvemos a subir
             recarga();
-            elevar();
+           // elevar();
         }
         else{
             Info("TENGO SUFICIENTE ENERGIA " + energy + " PARA EJECUTAR " + coste(acciones));
@@ -337,17 +387,18 @@ public class Seeker extends Drone{
     }
 
     private void sendSearchPoint(String agent) {
+        ACLMessage outRecueTeam = new ACLMessage();
         JsonObject contenido = new JsonObject();
         contenido.add("posx", position[0]);
         contenido.add("posy", position[1]);
-        out.setSender(getAID());
-        out.addReceiver(new AID(agent, AID.ISLOCALNAME));
-        out.setContent(contenido.toString());
-        out.setConversationId(myConvID);
-        out.setProtocol("REGULAR");
-        out.setPerformative(ACLMessage.REQUEST);
+        outRecueTeam.setSender(getAID());
+        outRecueTeam.addReceiver(new AID(agent, AID.ISLOCALNAME));
+        outRecueTeam.setContent(contenido.toString());
+        outRecueTeam.setConversationId(myConvID);
+        outRecueTeam.setProtocol("REGULAR");
+        outRecueTeam.setPerformative(ACLMessage.REQUEST);
         
-        this.send(out);
+        this.send(outRecueTeam);
     }
 
     

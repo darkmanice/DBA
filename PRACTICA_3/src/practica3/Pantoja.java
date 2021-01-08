@@ -175,9 +175,29 @@ public class Pantoja extends IntegratedAgent {
                 mandarConvId("Listener", "");
                 
                 mandarConvId("AWACS_CELLNEX", "");
-                myStatus = "WAITING";
+                myStatus = "WAITING-COMPRAS";
                 break;
                 
+                
+            case "WAITING-COMPRAS":
+            {
+                try {
+                    Thread.sleep(15000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Pantoja.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+                //Establecemos una cola para comprar
+                //1.Cajal (Seeker) puede comprar
+                in = sendPuedesComprar("Cajal");
+                
+                //2.Ramon (Rescuer) puede comprar
+                in = sendPuedesComprar("Ramon");
+                
+                myStatus = "WAITING";
+                break;
+
+            
             case "WAITING":
                 
                 while (contador != 0){
@@ -325,5 +345,17 @@ public class Pantoja extends IntegratedAgent {
         out.setProtocol("ANALYTICS");
         out.setPerformative(ACLMessage.CANCEL);
         send(out);
+    }
+
+    private ACLMessage sendPuedesComprar(String agent) {
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID(agent, AID.ISLOCALNAME));
+        out.setContent("");
+        out.setConversationId(myConvID);
+        out.setProtocol("ANALYTICS");
+        out.setPerformative(ACLMessage.REQUEST);
+        send(out);
+        return this.blockingReceive();
     }
 }
