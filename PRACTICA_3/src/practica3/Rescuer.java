@@ -17,8 +17,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author prueba
+ * Agente tipo RESCUER que utiliza las operaciones y atributos heredados de Drone e implementa operaciones especificas de rescate
+ * @author Marina: implementación
+ * @author Román: implementación
+ * @author Javier: implementación
  */
 public class Rescuer extends Drone {
 
@@ -26,6 +28,13 @@ public class Rescuer extends Drone {
     private int destinox;
     private int destinoy;
 
+    /**
+     * Setup para inicializar nuestras variables.
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     */
     @Override
     public void setup() {
         super.setup();
@@ -33,12 +42,21 @@ public class Rescuer extends Drone {
         //Lista de articulos deseados
         myWishlist.add("GPS");
         myWishlist.add("COMPASS");
-
     }
-
+    
+    /**
+     * Bucle principal que consiste en un switch con cada uno de los estados posibles
+     * de ejecución
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     */
     @Override
     public void plainExecute() {
         switch (myStatus.toUpperCase()) {
+            
+            //Caso que identifica a este agente en Sphinx
             case "CHECKIN-LARVA":
                 Info("Haciendo el checkin en LARVA con " + _identitymanager);
                 in = sendCheckinLARVA(_identitymanager);
@@ -52,6 +70,7 @@ public class Rescuer extends Drone {
                 myStatus = "GETYP";
                 break;
 
+            //Caso que pide las YP a Sphinx y obtiene el nombre de nuestro WorldManager-
             case "GETYP":
                 Info("Petición de las Yellow Pages.");
                 in = sendYPQueryRef(_identitymanager);
@@ -76,6 +95,7 @@ public class Rescuer extends Drone {
                 myStatus = "WAITING";
                 break;
 
+            //Caso donde esperamos a que nuestro controlador nos envia el convID y las coordenadas de inicio
             case "WAITING":
                 in = blockingReceive();
                 if (in.getPerformative() == ACLMessage.QUERY_IF) {
@@ -90,6 +110,7 @@ public class Rescuer extends Drone {
                 }
                 break;
 
+            //Caso para suscribirnos al WM como RESCUER
             case "SUBSCRIBE-WM":
                 in = sendSubscribeWM("RESCUER");
 
@@ -112,6 +133,7 @@ public class Rescuer extends Drone {
                 myStatus = "START-SHOPPING";
                 break;
 
+            //Caso para captar nuestras tiendas por primera vez
             case "START-SHOPPING": //Coger las tiendas de esta sesion
                 in = sendYPQueryRef(_identitymanager);
                 myError = (in.getPerformative() != ACLMessage.INFORM);
@@ -137,6 +159,7 @@ public class Rescuer extends Drone {
                 myStatus = "SHOPPING";
                 break;
 
+            //Caso para realizar las compras: esperamos nuestro turno, compramos y mandamos mensaje de finalización
             case "SHOPPING":
                 //Esperamos a que Pantoja abra las rebajas
                 in = blockingReceive();
@@ -152,6 +175,7 @@ public class Rescuer extends Drone {
                 myStatus = "LOGIN-PROBLEM";
                 break;
 
+            //Caso para loguearnos en el mapa 
             case "LOGIN-PROBLEM":
                 in = blockingReceive();
                 try {
@@ -181,6 +205,7 @@ public class Rescuer extends Drone {
                 myStatus = "WAITING-TARGET";
                 break;
 
+            //Caso en el que esperamos a que algun seeker envie un target para rescatar
             case "WAITING-TARGET":
                 Info("WAITING TARGET");
                 in = blockingReceive();
@@ -195,6 +220,7 @@ public class Rescuer extends Drone {
                 }
                 break;
 
+            //Proceso de rescate: recargar energia, ir al punto de rescate y volver al punto de inicio
             case "RESCUING":
                 recarga();
                 energy = 1000;
@@ -210,12 +236,14 @@ public class Rescuer extends Drone {
                 irA(CoordInicio[0], CoordInicio[1]);
                 readSensores();
                 
+                //Usamos la funcion rescatar para bajar
                 rescatar();
                 
                 myStatus = "WAITING-TARGET";
 
                 break;
 
+            //Caso para cerrar sesión en Sphinx   
             case "CHECKOUT-LARVA":
                 //TODO: Mandar mensaje al coach de que me voy
                 Info("Haciendo checkout de LARVA en" + _identitymanager);
@@ -223,7 +251,8 @@ public class Rescuer extends Drone {
                 in = sendCheckoutLARVA(_identitymanager);
                 myStatus = "EXIT";
                 break;
-
+                
+            //Caso para salir del programa    
             case "EXIT":
                 Info("El agente muere");
                 _exitRequested = true;
@@ -232,7 +261,13 @@ public class Rescuer extends Drone {
         }
     }
     
-
+    /**
+     * Metodo para bajar y rescatar
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     */
     private void rescatar() {
         int aux = altimeter;
         int aux2 = energy;
@@ -258,6 +293,13 @@ public class Rescuer extends Drone {
         Info("GERETTET !!!");
     }
 
+    /**
+     * Metodo para enviar un mensaje a nuestra pareja informando que hemos rescatado a un objetivo
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     */
     private void sendRescued() {
         ACLMessage outRescueTeam = new ACLMessage();
         outRescueTeam.setSender(this.getAID());

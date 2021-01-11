@@ -20,9 +20,11 @@ import java.util.HashMap;
 import java.util.Stack;
 
 /**
- * Agente que se dedica a rescatar.
+ * Agente abstracto que implementa operaciones que puede utilizar todo el equipo de rescate
  *
- * @author
+ * @author Marina: implementación
+ * @author Román: implementación
+ * @author Javier: implementación
  */
 public abstract class Drone extends IntegratedAgent {
 
@@ -49,10 +51,6 @@ public abstract class Drone extends IntegratedAgent {
     protected int position[] = new int[3]; //Posicion del drone
     protected int lidar[][] = new int[7][7];
     protected double thermal[][];
-    /*private int visual[] = new int[7*7];    //Vector con los datos arrojados por visual
-                                            //NO 16    //N 17  //NE 18
-                                            //O 23     //D 24  //E 25
-                                            //SO 30    //S 31  //SE 32*/
 
     protected int compass = -90;
     protected double angular;
@@ -71,6 +69,13 @@ public abstract class Drone extends IntegratedAgent {
     //Umbral para recargar la batería
     protected int energy_u = 50; 
     
+    /**
+     * Setup para inicializar nuestras variables.
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     */
     @Override
     public void setup() {
         _identitymanager = "Sphinx";
@@ -102,7 +107,7 @@ public abstract class Drone extends IntegratedAgent {
         myYP = new YellowPages();
         
         //Problem
-        myProblem = "PlayGround1";
+        myProblem = "World6";
         myMap = new Map2DGrayscale();
         
         //Panel de control
@@ -112,12 +117,28 @@ public abstract class Drone extends IntegratedAgent {
         _exitRequested = false;
     }
 
+    /**
+     * Metodo para terminar la ejecución del programa
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     */
     @Override
     public void takeDown() {
         Info("Taking down");
         super.takeDown();
     }
 
+    /**
+     * Metodo para enviar el mensaje de suscripción a Sphinx
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param im String con el nombre del agente
+     * @return respuesta al mensaje
+     */
     protected ACLMessage sendCheckinLARVA(String im) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -130,6 +151,16 @@ public abstract class Drone extends IntegratedAgent {
         return blockingReceive();
     }
 
+    /**
+     * Metodo para enviar el mensaje de desuscripción a Sphinx
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @return respuesta al mensaje
+     * @param im String con el nombre del agente
+     * @return respuesta al mensaje
+     */
     protected ACLMessage sendCheckoutLARVA(String im) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -142,6 +173,16 @@ public abstract class Drone extends IntegratedAgent {
         return blockingReceive();
     }
 
+    /**
+     * Metodo para enviar el mensaje de petición de YP
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @return respuesta al mensaje
+     * @param im String con el nombre del agente
+     * @return respuesta al mensaje
+     */
     protected ACLMessage sendYPQueryRef(String im) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -154,6 +195,15 @@ public abstract class Drone extends IntegratedAgent {
         return blockingReceive();
     }
 
+    /**
+     * Metodo para enviar el mensaje de suscripción al WM como tipo
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param tipo String con el tipo de agente = {LISTENER, RESCUER, SEEKER}
+     * @return respuesta al mensaje
+     */
     protected ACLMessage sendSubscribeWM(String tipo) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -166,6 +216,15 @@ public abstract class Drone extends IntegratedAgent {
         return this.blockingReceive();
     }
 
+    /**
+     * Metodo para enviar el mensaje a una tienda y que nos devuelva su lista de productos
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param shop String con el nombre de la tienda
+     * @return respuesta al mensaje
+     */
     protected ACLMessage getProductos(String shop) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -178,8 +237,16 @@ public abstract class Drone extends IntegratedAgent {
         return this.blockingReceive();
     }
 
+     /**
+     * Algoritmo para gestionar las compras, busca el producto mas barato de cada tienda y el mas barato de las tres tiendas
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param miLista ArrayList<String> con la lista de la compra
+     */
     protected void comprar(ArrayList<String> miLista) {
 
+        //Compramos un primer charge
         miLista.add("CHARGE");
 
         Info("Comprando...");
@@ -187,10 +254,7 @@ public abstract class Drone extends IntegratedAgent {
         //Por cada elemento de la lista de deseos
         for (String elemento : miLista) {
             boolean compraCarga = true;
-            //while (compraCarga) {
-                //if (!elemento.equals("CHARGE")) {
-//                    compraCarga = false;
-//                }
+  
                 //Actualizamos las tiendas
                 updateShops();
                 String eleccionTienda0 = "";
@@ -200,6 +264,7 @@ public abstract class Drone extends IntegratedAgent {
                 int precioAuxiliar0 = 0;
                 int precioAuxiliar1 = 0;
                 int precioAuxiliar2 = 0;
+                
                 //Comprobamos en cada tienda cual es el articulo mas barato con ese nombre
                 //TIENDA 0
                 for (String i : tienda0.keySet()) {
@@ -216,6 +281,7 @@ public abstract class Drone extends IntegratedAgent {
                         }
                     }
                 }
+                
                 //TIENDA 1
                 for (String i : tienda1.keySet()) {
                     String auxiliar = i.split("#")[0];
@@ -231,6 +297,7 @@ public abstract class Drone extends IntegratedAgent {
                         }
                     }
                 }
+                
                 //TIENDA 2
                 for (String i : tienda2.keySet()) {
                     String auxiliar = i.split("#")[0];
@@ -313,11 +380,20 @@ public abstract class Drone extends IntegratedAgent {
                     }
                     auxCoins = new Stack();
                 }
-
-//            }
         }
     }
 
+     /**
+     * Metodo para enviar el mensaje de compra
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param producto String con la referencia del producto
+     * @param tienda String con el nombre de la tienda
+     * @param precio int con el numero de coins a gastar
+     * @return respuesta al mensaje
+     */
     protected ACLMessage sendComprar(String producto, String tienda, int precio) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -341,6 +417,13 @@ public abstract class Drone extends IntegratedAgent {
         return this.blockingReceive();
     }
 
+     /**
+     * Metodo para enviar un mensaje al controlador de que nos vamos del programa
+     * 
+     * @author Marina
+     * @author Román
+     * @author Javier
+     */
     protected void sendLogoutCoach() {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -352,6 +435,14 @@ public abstract class Drone extends IntegratedAgent {
         send(out);
     }
 
+     /**
+     * Metodo para actualizar las tiendas y guardarlas en tres hash map globales
+     * 
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @return exito/fracaso de la operacion
+     */
     protected boolean updateShops() {
 
         tienda0 = new HashMap<String, Integer>();
@@ -366,7 +457,6 @@ public abstract class Drone extends IntegratedAgent {
             myStatus = "CHECKOUT-LARVA";
             return false;
         }
-        //System.out.println(in.getContent());
 
         //Pasamos el content a HashMap
         for (JsonValue j : Json.parse(in.getContent()).asObject().get("products").asArray()) {
@@ -383,7 +473,6 @@ public abstract class Drone extends IntegratedAgent {
             return false;
         }
 
-        //System.out.println(in.getContent());
         //Pasamos el content a HashMap
         for (JsonValue j : Json.parse(in.getContent()).asObject().get("products").asArray()) {
             tienda1.put(j.asObject().get("reference").asString(), j.asObject().get("price").asInt());
@@ -399,7 +488,6 @@ public abstract class Drone extends IntegratedAgent {
             return false;
         }
 
-        //System.out.println(in.getContent());
         //Pasamos el content a HashMap
         for (JsonValue j : Json.parse(in.getContent()).asObject().get("products").asArray()) {
             tienda2.put(j.asObject().get("reference").asString(), j.asObject().get("price").asInt());
@@ -408,6 +496,14 @@ public abstract class Drone extends IntegratedAgent {
         return true;
     }
 
+     /**
+     * Metodo para inicializar sensores
+     * 
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param mapa Mapa del mundo
+     */
     protected void inicializarSensores( Map2DGrayscale mapa){
         //Captamos el mapa
         myMap = mapa;
@@ -426,6 +522,14 @@ public abstract class Drone extends IntegratedAgent {
         }
     }
     
+    /**
+     * Metodo para enviar el mensaje de suscripción al WM 
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @return respuesta al mensaje
+     */
     protected ACLMessage sendLoginProblem() {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -449,6 +553,13 @@ public abstract class Drone extends IntegratedAgent {
         return this.blockingReceive();
     }
     
+    /**
+     * Metodo para leer los sensores y almacenarlos en sus variables globales correspondientes
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     */
     protected void readSensores() {
         out = new ACLMessage();
         JsonObject json = new JsonObject();
@@ -511,7 +622,7 @@ public abstract class Drone extends IntegratedAgent {
             }
         }
 
-        //Rellenar mundo, lidar y thermal tras leer el resto de sonsores
+        //Rellenar lidar y thermal tras leer el resto de sonsores
         for (JsonValue j : json.get("details").asObject().get("perceptions").asArray()) {
             
             
@@ -543,6 +654,15 @@ public abstract class Drone extends IntegratedAgent {
 
     }
     
+    /**
+     * Metodo para elevar un dron a maxima altura del mundo
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param agent String con el nombre del agente
+     * @return exito/fracaso de la operacion
+     */
     protected boolean elevar() {
         while (position[2] < this.altura_max) {
             if (energy_u > (energy - 5)) {
@@ -569,6 +689,15 @@ public abstract class Drone extends IntegratedAgent {
         return true;
     }
 
+    /**
+     * Metodo para enviar un mensaje con una accion de movimiento determinada
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param accion String con el nombre de la acción
+     * @return respuesta al mensaje
+     */
     protected ACLMessage sendAction(String accion){
         out = new ACLMessage();
         JsonObject contenido = new JsonObject();
@@ -584,6 +713,14 @@ public abstract class Drone extends IntegratedAgent {
         return this.blockingReceive();
     }
     
+    /**
+     * Metodo para recargar bateria, compramos un ticket de recarga y enviamos mensaje
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @return exito/fracaso de la operacion
+     */
     protected boolean recarga(){
         if(myCharges.isEmpty()){
             ArrayList<String> comprarCharges = new ArrayList<>();
@@ -635,6 +772,14 @@ public abstract class Drone extends IntegratedAgent {
         return true;
     }
     
+    /**
+     * Metodo para enviar el mensaje de recarga al servidor
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @return respuesta al mensaje
+     */
     protected ACLMessage sendRecharge(){
         out = new ACLMessage();
         out.addReceiver(new AID(myWorldManager, AID.ISLOCALNAME));
@@ -651,6 +796,13 @@ public abstract class Drone extends IntegratedAgent {
         return this.blockingReceive();
     }
     
+    /**
+     * Metodo para enviar al controlador un mensaje de que hemos acabado de comprar
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     */
     protected void sendFinCompra(){
         ACLMessage outPantoja = new ACLMessage();
         outPantoja.setSender(this.getAID());
@@ -663,8 +815,15 @@ public abstract class Drone extends IntegratedAgent {
         
     }
     
-    
-    
+    /**
+     * Metodo para calcular el coste de un array de acciones
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param acciones ArrayList<String> vector de acciones
+     * @return coste de las acciones + coste de leer los sensores
+     */
     protected int coste(ArrayList<String> acciones){
         int coste = mySensors.size();
        
@@ -694,6 +853,15 @@ public abstract class Drone extends IntegratedAgent {
         return coste;
     }
     
+    /**
+     * Metodo reutilizado de la P2, calcula la diferencia de distancias y las almacena en un array
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     * @param casillas casillas a las que el drone puede ir
+     * @param distancias distancias de las casillas a las que el drone puede ir
+     */
     protected void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
         if (position[0] < (myMap.getWidth() - 1)){
             casillas.add("E");
@@ -773,6 +941,15 @@ public abstract class Drone extends IntegratedAgent {
         }
     }
     
+    /**
+     * Metodo reutilizado de la P2, metodo para ordenar un array de menor a mayor
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     * @param casillas Array con las casillas a las que el drone puede ir
+     * @param distancias Array con las distancias a las casillas que el drone puede ir
+     */
     protected void burbuja(ArrayList<String> casillas, ArrayList<Double> distancias) {
         //Ordenamos por orden de distancias
         int i;
@@ -799,6 +976,16 @@ public abstract class Drone extends IntegratedAgent {
         }
     }
 
+    /**
+     * Método reutilizado de la P2, calcula el numero de giros y subidas o bajadas que debe hacer el agente para movernos segun el angulo y la altura de la siguiente casilla a visitar
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     * @param angulo angulo en grados al que queremos girar el drone
+     * @param altura altura de la casilla a la que apunta el grado
+     * @return array de acciones a ejecutar
+     */
     protected ArrayList<String> calculaGiroySubida(double angulo, int altura) {
         ArrayList<String> acciones = new ArrayList<>();
         int anguloCasilla;
@@ -853,7 +1040,13 @@ public abstract class Drone extends IntegratedAgent {
         
         return acciones;
     }
-    //(-angulo + 90) si es -180 pasarlo a 180
+    
+    /**
+     * Metodo que dada una posicion calcula y ejecuta las acciones que nos llevarán a ese punto
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     */
     protected void irA(int destinox, int destinoy) {
         double distancia;
         double angulo;

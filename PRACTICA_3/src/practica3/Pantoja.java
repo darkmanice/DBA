@@ -13,10 +13,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Agente que hace las veces de controlador y de jefe de equipo. Es el primero
- * en conectarse al WM y enviar el codigo de la sesion al resto de agentes
- *
- * @author
+ * Agente que hace las veces de controlador y de jefe de equipo. 
+ * Funcionamiento:
+ * Es el primero en conectarse al WM y enviar el codigo de la sesion al resto de agentes
+ * Establece un turno de compras entre los agentes del equipo, para que no compren a la vez.
+ * Para hacer logout, espera a que todos los agentes se vayan y comunica al listener que tiene que cerrar sesión y, por ultimo, cierra sesión.
+ * 
+ * @author Marina: implementación y diseño
+ * @author Román: implementación y diseño
+ * @author Javier: implementación y diseño
  */
 public class Pantoja extends IntegratedAgent {
 
@@ -26,8 +31,15 @@ public class Pantoja extends IntegratedAgent {
     protected ACLMessage in, out;
     protected Map2DGrayscale myMap;
     
-    int contador;
+    int contador; //Numero de agentes conectados del equipo de rescate
 
+    /**
+     * Setup para inicializar nuestras variables.
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     */
     @Override
     public void setup() {
         contador = 2;
@@ -42,7 +54,7 @@ public class Pantoja extends IntegratedAgent {
         myService = "Analytics group Cellnex";
 
         // The world I am going to open
-        myWorld = "Playground1";
+        myWorld = "World6";
 
         // First state of the agent
         myStatus = "CHECKIN-LARVA";
@@ -53,12 +65,23 @@ public class Pantoja extends IntegratedAgent {
         _exitRequested = false;
     }
 
+    /**
+     * Bucle principal que consiste en un switch con cada uno de los estados posibles
+     * de ejecución
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     */
     @Override
     public void plainExecute() {
         switch (myStatus.toUpperCase()) {
+            
+            //Caso que identifica a este agente en Sphinx
             case "CHECKIN-LARVA":
                 Info("Haciendo el checkin en LARVA con " + _identitymanager);
                 in = sendCheckinLARVA(_identitymanager);
+                
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
                     Info("\t" + ACLMessage.getPerformative(in.getPerformative())
@@ -69,9 +92,12 @@ public class Pantoja extends IntegratedAgent {
                 myStatus = "SUBSCRIBE-WM";
                 break;
 
+            //Caso que pide las YP a Sphinx y obtiene el nombre de nuestro WorldManager y se suscribe y crea la sesión, obteniendo el convID
             case "SUBSCRIBE-WM":
+                
                 Info("Petición de las Yellow Pages.");
                 in = sendYPQueryRef(_identitymanager);
+                
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
                     Info("\t" + ACLMessage.getPerformative(in.getPerformative())
@@ -79,15 +105,16 @@ public class Pantoja extends IntegratedAgent {
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
+                
                 //Mostrar las YP
                 myYP.updateYellowPages(in);
-                //System.out.print(myYP.prettyPrint());
-
+           
                 if (myYP.queryProvidersofService(myService).isEmpty()) {
                     Info("\t" + "No hay ningun agente que proporcione el servicio: " + myService);
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
+                
                 //Cogemos el World Manager de la lista de servicios
                 myWorldManager = myYP.queryProvidersofService(myService).iterator().next();
                 //Nos suscribimos
@@ -101,13 +128,14 @@ public class Pantoja extends IntegratedAgent {
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
+                
                 //Guardamos el conversationID
                 myConvID = in.getConversationId();
                
                 myStatus = "PROCESS-MAP";
-    
                 break;
                 
+            //Caso para procesar y guardar en nuestro sistema el mapa del mundo
             case "PROCESS-MAP":
                 System("Save map of world " + myWorld);
                 // Examines the content of the message from server
@@ -142,14 +170,15 @@ public class Pantoja extends IntegratedAgent {
                 }
                 myStatus = "MANDAR-CONVID";
                 break; 
-                
+               
+            //Caso para enviar el convID al resto de agentes que están durmiendo esperándolo
             case "MANDAR-CONVID":
                 Info("Enviando ConversationID a todos los agentes");
                 
                 int coordx, coordy;
                 JsonObject contenido;
                 
-                //Generar las coordenadas de inicio de los 
+                //Generar las coordenadas de inicio de los agentes
                 //Seeker1
                 coordx = myMap.getWidth() / 2  -2;
                 coordy = myMap.getHeight() / 2  -2;
@@ -161,6 +190,7 @@ public class Pantoja extends IntegratedAgent {
                 mandarConvId("Cajal", contenido.toString());
                 
                 //Seeker2
+                
                 //Rescuer1 (Coentro del mapa)
                 coordx = myMap.getWidth() / 2;
                 coordy = myMap.getHeight() / 2;
@@ -174,13 +204,17 @@ public class Pantoja extends IntegratedAgent {
                 
                 //Rescuer2
                 
+                //Listener
                 mandarConvId("Listener", "");
                 
+                //AWACS
                 mandarConvId("AWACS_CELLNEX", "");
+                
                 myStatus = "WAITING-COMPRAS";
                 break;
                 
-                
+            //Caso para generar una cola de compras, Pantoja da paso a los agentes a las tiendas uno a uno y espera a recibir un mensaje de fin de compra para ceder el turno al siguiente agente
+            //Una vez terminen de comprar, les envia un mensaje para que se logueen en el mundo
             case "WAITING-COMPRAS":
             {
                 try {
@@ -203,28 +237,28 @@ public class Pantoja extends IntegratedAgent {
                 myStatus = "WAITING";
                 break;
 
-            
+            //Caso en el que el agente espera a que todos los agentes cierren sesión para avisar al listener de que cierre y procede a hacer su checkout
             case "WAITING":
-                
-                while (contador != 0){
+
+                while (contador != 0) {
                     in = blockingReceive();
-                    if(in.getContent().equals("LOGOUT")){
+                    if (in.getContent().equals("LOGOUT")) {
                         contador--;
                     }
-                    
                 }
-                
-                    try { //Simulamos que los rescuers nos mandan un adios
-                        Thread.sleep(3000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Pantoja.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+
+                try { //Simulamos que los rescuers nos mandan un adios
+                    Thread.sleep(3000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Pantoja.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
                 //Mandamos mensaje a Listener para que cierre
                 mandarMensaje("Listener", "Cerramos el chiringuito");
-                myStatus="CANCEL-WM";
+                myStatus = "CANCEL-WM";
                 break;
 
-                
+            //Desuscripcion del WM, cierre del juego y de AWACS 
             case "CANCEL-WM":
                 Info("Cerrando el juego");
                 in = sendCANCELWM();
@@ -233,18 +267,20 @@ public class Pantoja extends IntegratedAgent {
                 myStatus = "CHECKOUT-LARVA";
                 break;
                 
-
+            //Caso para cerrar sesión en Sphinx   
             case "CHECKOUT-LARVA":
                 Info("Haciendo checkout de LARVA en" + _identitymanager);
                 in = sendCheckoutLARVA(_identitymanager);
                 myStatus = "EXIT";
                 break;
 
+            //Caso para salir del programa    
             case "EXIT":
                 Info("El agente muere");
                 _exitRequested = true;
                 break;
-                
+              
+            //Caso para controlar si los estados son validos
             default:
                 Info("Algun nombre del switch case no esta coincidiendo: " + myStatus);
                 myStatus = "CANCEL-WM";
@@ -252,13 +288,29 @@ public class Pantoja extends IntegratedAgent {
 
         }
     }
-
+   
+    /**
+     * Metodo para terminar la ejecución del programa
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     */
     @Override
     public void takeDown() {
         Info("Taking down");
         super.takeDown();
     }
 
+    /**
+     * Metodo para enviar el mensaje de suscripción a Sphinx
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param im String con el nombre del agente
+     * @return respuesta al mensaje
+     */
     private ACLMessage sendCheckinLARVA(String im) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -271,6 +323,16 @@ public class Pantoja extends IntegratedAgent {
         return blockingReceive();
     }
 
+    /**
+     * Metodo para enviar el mensaje de desuscripción a Sphinx
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @return respuesta al mensaje
+     * @param im String con el nombre del agente
+     * @return respuesta al mensaje
+     */
     private ACLMessage sendCheckoutLARVA(String im) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -283,6 +345,16 @@ public class Pantoja extends IntegratedAgent {
         return blockingReceive();
     }
 
+    /**
+     * Metodo para enviar el mensaje de petición de YP
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @return respuesta al mensaje
+     * @param im String con el nombre del agente
+     * @return respuesta al mensaje
+     */
     private ACLMessage sendYPQueryRef(String im) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -295,6 +367,15 @@ public class Pantoja extends IntegratedAgent {
         return blockingReceive();
     }
 
+    /**
+     * Metodo para enviar el primer mensaje de suscripción al WM
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param problem String con el nombre del mundo
+     * @return respuesta al mensaje
+     */
     private ACLMessage sendSubscribeWM(String problem) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -306,6 +387,14 @@ public class Pantoja extends IntegratedAgent {
         return this.blockingReceive();
     }
 
+    /**
+     * Metodo para enviar el mensaje de desuscripción al WM
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @return respuesta al mensaje
+     */
     private ACLMessage sendCANCELWM() {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -318,6 +407,15 @@ public class Pantoja extends IntegratedAgent {
         return blockingReceive();
     }
 
+    /**
+     * Metodo para enviar mensaje al listener para que cierre el programa
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param im String con el nombre del agente
+     * @param content Mensaje de cierre
+     */
     private void mandarMensaje(String im, String content) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -329,6 +427,17 @@ public class Pantoja extends IntegratedAgent {
         send(out);
         
     }
+    
+    /**
+     * Metodo para enviar el convID y la posicion del mundo
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param im String con el nombre del agente
+     * @param coor coordenadas del mundo en las que aparecemos en el mapa
+     * @param coor convID
+     */
     private void mandarConvId(String im, String coor) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -342,6 +451,13 @@ public class Pantoja extends IntegratedAgent {
         
     }
 
+    /**
+     * Metodo para enviar el mensaje de cancel a AWACS
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     */
     private void sendCANCELAWACS() {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -353,6 +469,15 @@ public class Pantoja extends IntegratedAgent {
         send(out);
     }
 
+    /**
+     * Metodo para enviar el primer mensaje de suscripción al WM
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param agent String con el nombre del agente
+     * @return respuesta al mensaje
+     */
     private ACLMessage sendPuedesComprar(String agent) {
         out = new ACLMessage();
         out.setSender(getAID());
@@ -365,6 +490,15 @@ public class Pantoja extends IntegratedAgent {
         return this.blockingReceive();
     }
 
+    /**
+     * Metodo para enviar el mensaje de paso a suscripción al WM a un agente
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     * @param agent String con el nombre del agente
+     * @return respuesta al mensaje
+     */
     private void sendLoginProblem(String agent) {
         out = new ACLMessage();
         out.setSender(getAID());

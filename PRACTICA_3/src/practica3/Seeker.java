@@ -17,11 +17,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author prueba
+ * Agente tipo SEEKER que utiliza las operaciones y atributos heredados de Drone e implementa operaciones especificas de busqueda
+ * @author Marina: implementación
+ * @author Román: implementación
+ * @author Javier: implementación
  */
 public class Seeker extends Drone{
     
+    /**
+     * Setup para inicializar nuestras variables.
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     */
     @Override
     public void setup(){
         super.setup();
@@ -35,9 +44,19 @@ public class Seeker extends Drone{
         
     }
 
+    /**
+     * Bucle principal que consiste en un switch con cada uno de los estados posibles
+     * de ejecución
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     */
     @Override
     public void plainExecute() {
         switch (myStatus.toUpperCase()) {
+            
+            //Caso que identifica a este agente en Sphinx
             case "CHECKIN-LARVA":
                 Info("Haciendo el checkin en LARVA con " + _identitymanager);
                 in = sendCheckinLARVA(_identitymanager);
@@ -51,6 +70,7 @@ public class Seeker extends Drone{
                 myStatus = "GETYP";
                 break;
 
+            //Caso que pide las YP a Sphinx y obtiene el nombre de nuestro WorldManager-
             case "GETYP":
                 Info("Petición de las Yellow Pages.");
                 in = sendYPQueryRef(_identitymanager);
@@ -75,6 +95,7 @@ public class Seeker extends Drone{
                 myStatus = "WAITING";
                 break;
 
+            //Caso donde esperamos a que nuestro controlador nos envia el convID y las coordenadas de inicio
             case "WAITING":
                 in = blockingReceive();
                 if (in.getPerformative() == ACLMessage.QUERY_IF) {
@@ -88,7 +109,7 @@ public class Seeker extends Drone{
                     myStatus = "SUBSCRIBE-WM";
                 }
                 break;
-
+            //Caso para suscribirnos al WM como SEEKER
             case "SUBSCRIBE-WM":
                 in = sendSubscribeWM("RESCUER");
 
@@ -111,6 +132,7 @@ public class Seeker extends Drone{
                 myStatus = "START-SHOPPING";
                 break;
 
+            //Caso para captar nuestras tiendas por primera vez
             case "START-SHOPPING": //Coger las tiendas de esta sesion
                 in = sendYPQueryRef(_identitymanager);
                 myError = (in.getPerformative() != ACLMessage.INFORM);
@@ -136,6 +158,7 @@ public class Seeker extends Drone{
                 myStatus = "SHOPPING";
                 break;
 
+            //Caso para realizar las compras: esperamos nuestro turno, compramos y mandamos mensaje de finalización
             case "SHOPPING":
                 //Esperamos a que Pantoja abra las rebajas
                 in = blockingReceive();
@@ -151,7 +174,7 @@ public class Seeker extends Drone{
                 myStatus = "LOGIN-PROBLEM";
                 break;
 
-                
+            //Caso para loguearnos en el mapa    
             case "LOGIN-PROBLEM":
                 in = blockingReceive();
                 
@@ -196,9 +219,8 @@ public class Seeker extends Drone{
                 myStatus = "SEEKING";
                 break;
 
-                
+            //Caso para buscar objetivos: calculamos acciones posibles hasta llegar a un target y enviarlo al rescuer
             case "SEEKING":
-                //**************************************************
                 //Incrementamos el iterador
                 iterador++;
                 //Leer los sensores
@@ -214,6 +236,7 @@ public class Seeker extends Drone{
                 }
                 break;
 
+            //Caso en el que esperamos a que nuestra pareja rescuer encuentre al objetivo para buscar a otro target
             case "WAITING-RESCUER":
                 Info("WAITING RESCUER");
                 //Elevamos dos veces al agente
@@ -230,7 +253,8 @@ public class Seeker extends Drone{
                 }
                 
                 break;
-                
+
+            //Caso para cerrar sesión en Sphinx   
             case "CHECKOUT-LARVA":
                 //TODO: Mandar mensaje al coach de que me voy
                 Info("Haciendo checkout de LARVA en" + _identitymanager);
@@ -238,7 +262,8 @@ public class Seeker extends Drone{
                 in = sendCheckoutLARVA(_identitymanager);
                 myStatus = "EXIT";
                 break;
-
+    
+            //Caso para salir del programa    
             case "EXIT":
                 Info("El agente muere");
                 _exitRequested = true;
@@ -246,6 +271,15 @@ public class Seeker extends Drone{
 
         }
     }
+    
+    /**
+     * Método reutilizado de la p2, Calcula la siguiente acción (o cadena de acciones) que debe realizar el drone
+     *
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     * @return array de acciones a ejecutar
+     */
     protected ArrayList<String> calcularAccionesPosibles(){
         ArrayList<String> acciones = new ArrayList<>();
         
@@ -345,6 +379,14 @@ public class Seeker extends Drone{
         return acciones;
     }
 
+    /**
+     * Método para enviar el punto de un alemán a un rescuer para que lo rescate
+     * 
+     * @author Marina: implementación
+     * @author Román: implementación
+     * @author Javier: implementación
+     * @param agent String con el nombre del agente
+     */
     private void sendSearchPoint(String agent) {
         ACLMessage outRecueTeam = new ACLMessage();
         JsonObject contenido = new JsonObject();
