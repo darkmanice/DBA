@@ -157,7 +157,6 @@ public class Pantoja extends IntegratedAgent {
                             Info("\tX: " + px + ", Y:" + py + " = " + myMap.getLevel(px, py));
                 
                         }
-                        myStatus = "CANCEL-WM";
                     } else {
                         Info("\t" + "There was an error processing and saving the image ");
                         myStatus = "CANCEL-WM";
