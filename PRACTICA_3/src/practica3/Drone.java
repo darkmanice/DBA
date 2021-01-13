@@ -1053,6 +1053,11 @@ public abstract class Drone extends IntegratedAgent {
         double angulo;
         ArrayList<String> actions = new ArrayList<>();
         
+        if (2*energy_u > energy ) {
+            recarga();
+            energy = 1000;
+        }
+        
         int anguloCasilla;
         Point orig = new Point(destinox,destinoy);
         Point here;

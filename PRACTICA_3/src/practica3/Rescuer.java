@@ -222,16 +222,12 @@ public class Rescuer extends Drone {
 
             //Proceso de rescate: recargar energia, ir al punto de rescate y volver al punto de inicio
             case "RESCUING":
-                recarga();
-                energy = 1000;
-
                 irA(destinox, destinoy);
 
                 rescatar();
                 sendRescued();
                 in = sendAction("moveUP");
-                recarga();
-                energy = 1000;
+                
 
                 irA(CoordInicio[0], CoordInicio[1]);
                 readSensores();
@@ -310,6 +306,11 @@ public class Rescuer extends Drone {
         outRescueTeam.setPerformative(ACLMessage.INFORM);
 
         this.send(outRescueTeam);
+    }
+    
+    @Override
+    protected int coste(ArrayList<String> acciones){
+        return 4*super.coste(acciones);
     }
 
 }

@@ -76,6 +76,8 @@ public class Listener extends IntegratedAgent {
                 Info("Haciendo el checkin en LARVA con " + _identitymanager);
                 in = sendCheckinLARVA(_identitymanager);
                 
+                Info(getDetailsLARVA(in));
+                
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
                     Info("\t" + ACLMessage.getPerformative(in.getPerformative())
