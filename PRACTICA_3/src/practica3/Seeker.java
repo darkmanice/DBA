@@ -6,6 +6,7 @@
 package practica3;
 
 import static ACLMessageTools.ACLMessageTools.getDetailsLARVA;
+import ConsoleAnsi.ConsoleAnsi;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
@@ -17,37 +18,39 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Agente tipo SEEKER que utiliza las operaciones y atributos heredados de Drone e implementa operaciones especificas de busqueda
+ * Agente tipo SEEKER que utiliza las operaciones y atributos heredados de Drone
+ * e implementa operaciones especificas de busqueda
+ *
  * @author Marina: implementación
  * @author Román: implementación
  * @author Javier: implementación
  */
-public class Seeker extends Drone{
-    
+public class Seeker extends Drone {
+
     /**
      * Setup para inicializar nuestras variables.
-     * 
+     *
      * @author Marina: implementación
      * @author Román: implementación
      * @author Javier: implementación
      */
     @Override
-    public void setup(){
+    public void setup() {
         super.setup();
-        
+
         //Lista de articulos deseados   //"alive", "distance", "gps", "visual", "angular", "compass", "energy"
-        myWishlist.add("DISTANCE"); 
-        myWishlist.add("GPS"); 
-        myWishlist.add("ANGULAR"); 
-        myWishlist.add("COMPASS"); 
-        myWishlist.add("ENERGY"); 
-        
+        myWishlist.add("DISTANCE");
+        myWishlist.add("GPS");
+        myWishlist.add("ANGULAR");
+        myWishlist.add("COMPASS");
+        myWishlist.add("ENERGY");
+
     }
 
     /**
-     * Bucle principal que consiste en un switch con cada uno de los estados posibles
-     * de ejecución
-     * 
+     * Bucle principal que consiste en un switch con cada uno de los estados
+     * posibles de ejecución
+     *
      * @author Marina: implementación
      * @author Román: implementación
      * @author Javier: implementación
@@ -55,7 +58,7 @@ public class Seeker extends Drone{
     @Override
     public void plainExecute() {
         switch (myStatus.toUpperCase()) {
-            
+
             //Caso que identifica a este agente en Sphinx
             case "CHECKIN-LARVA":
                 Info("Haciendo el checkin en LARVA con " + _identitymanager);
@@ -105,7 +108,7 @@ public class Seeker extends Drone{
                     CoordInicio[1] = Json.parse(in.getContent()).asObject().get("Y").asInt();
                     altura_max = Json.parse(in.getContent()).asObject().get("altura_max").asInt();
                     myName = Json.parse(in.getContent()).asObject().get("nombre").asString();
-                   
+
                     myStatus = "SUBSCRIBE-WM";
                 }
                 break;
@@ -166,8 +169,7 @@ public class Seeker extends Drone{
                     //Algoritmo que gestiona las compras
                     comprar(myWishlist);
                 }
-            
-            
+
                 //avisar de que he terminado mis compras
                 sendFinCompra();
 
@@ -177,23 +179,22 @@ public class Seeker extends Drone{
             //Caso para loguearnos en el mapa    
             case "LOGIN-PROBLEM":
                 in = blockingReceive();
-                
-            
+
                 try {
                     //Cargar el mapa
                     Info("Cargando mapa...");
                     myMap.loadMap(myProblem + ".png");
-                    
+
                 } catch (IOException ex) {
                     Logger.getLogger(Seeker.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-               //Inicializamos los sensores del dron
+
+                //Inicializamos los sensores del dron
                 inicializarSensores(myMap);
-                
+
                 //Pasamos los sensores y las coordenadas de inicio al WM
                 in = sendLoginProblem();
-                
+
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
                     Info(ACLMessage.getPerformative(in.getPerformative())
@@ -207,7 +208,7 @@ public class Seeker extends Drone{
                 energy = 10;
                 //Recargamos, estamos a la altura del suelo
                 in = sendRecharge();
-                 myError = (in.getPerformative() != ACLMessage.INFORM);
+                myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
                     Info(ACLMessage.getPerformative(in.getPerformative())
                             + " No se pudo hacer primer recharge en el problema con " + this.myWorldManager
@@ -215,7 +216,7 @@ public class Seeker extends Drone{
                     myStatus = "CHECKOUT-LARVA";
                     break;
                 }
-                        
+
                 myStatus = "SEEKING";
                 break;
 
@@ -225,14 +226,18 @@ public class Seeker extends Drone{
                 iterador++;
                 //Leer los sensores
                 readSensores();
-                
+
                 //Calcular acciones posibles
                 ArrayList<String> acciones = calcularAccionesPosibles();
-                
+
                 //Para cada una de las acciones, enviar mensajes al servidor
-                for(int i = 0; i<acciones.size(); i++){
-                        in = sendAction(acciones.get(i));
-                        myStatus ="SEEKING";
+                for (int i = 0; i < acciones.size(); i++) {
+                    in = sendAction(acciones.get(i));
+                    if (esError(in)) {
+                        myStatus = "CHECKOUT-LARVA";
+                        break;
+                    }
+                    myStatus = "SEEKING";
                 }
                 break;
 
@@ -240,18 +245,51 @@ public class Seeker extends Drone{
             case "WAITING-RESCUER":
                 Info("WAITING RESCUER");
                 //Elevamos dos veces al agente
-                if(energy_u > energy - 20){
-                   recarga(); 
+                if (energy_u > energy - 20) {
+                    recarga();
                 }
-                in = sendAction("moveUP");
-                in = sendAction("moveUP");
                 
-                in = blockingReceive();
-               
-                if (in.getPerformative() == ACLMessage.INFORM) {
+                
+                irA(position[0]-10, position[1]-10);
+                
+                in = sendAction("moveUP");
+                if (esError(in)) {
                     myStatus = "CHECKOUT-LARVA";
+                    break;
+                }
+                in = sendAction("moveUP");
+                if (esError(in)) {
+                    myStatus = "CHECKOUT-LARVA";
+                    break;
+                }
+                in = sendAction("moveUP");
+                if (esError(in)) {
+                    myStatus = "CHECKOUT-LARVA";
+                    break;
+                }
+                in = sendAction("moveUP");
+                if (esError(in)) {
+                    myStatus = "CHECKOUT-LARVA";
+                    break;
                 }
                 
+                Info("Esperando en: " + position[0] + position[1]);
+                in = blockingReceive();
+                if (esError(in)) {
+                    myStatus = "CHECKOUT-LARVA";
+                    break;
+                }
+                else{
+                    Info("Contenido: " + in.getContent());
+                    Info("Perforativa: " + in.getPerformative());
+                }
+
+                if (in.getPerformative() == ACLMessage.INFORM) {
+                    myStatus = "SEEKING";
+//                    ConsoleAnsi c = new ConsoleAnsi("30", 30, 10);
+//                    c.waitToClose();
+                }
+
                 break;
 
             //Caso para cerrar sesión en Sphinx   
@@ -262,7 +300,7 @@ public class Seeker extends Drone{
                 in = sendCheckoutLARVA(_identitymanager);
                 myStatus = "EXIT";
                 break;
-    
+
             //Caso para salir del programa    
             case "EXIT":
                 Info("El agente muere");
@@ -271,117 +309,117 @@ public class Seeker extends Drone{
 
         }
     }
-    
+
     /**
-     * Método reutilizado de la p2, Calcula la siguiente acción (o cadena de acciones) que debe realizar el drone
+     * Método reutilizado de la p2, Calcula la siguiente acción (o cadena de
+     * acciones) que debe realizar el drone
      *
      * @author Marina: implementación
      * @author Román: implementación
      * @author Javier: implementación
      * @return array de acciones a ejecutar
      */
-    protected ArrayList<String> calcularAccionesPosibles(){
+    protected ArrayList<String> calcularAccionesPosibles() {
         ArrayList<String> acciones = new ArrayList<>();
-        
+
         //Hacia donde ir
         ArrayList<String> casillas = new ArrayList<>();
         ArrayList<Double> distancias = new ArrayList<>();
-        
+
         diferenciaDistancias(casillas, distancias);
-        
+
         burbuja(casillas, distancias);
-        
+
         //Miramos si estamos encima del objetivo
-        if (distance == 0){
+        if (distance == 0) {
             Info("Target encontrado en: (" + position[0] + "," + position[1] + ")");
-           
+
             //comunicar al rescuer la posicion del aleman
-            if(position[1] <= myMap.getHeight()/2 ){
+            if (position[1] <= myMap.getHeight() / 2) {
                 //El target esta en la mitad superior y lo comunica al agente correspondiente -> Ramon
                 Info("Enviando coordenadas a Ortega");
                 sendSearchPoint("Ramon");
-            }
-            else{
+            } else {
                 Info("Enviando coordenadas a Ramon");
                 sendSearchPoint("Ramon");
             }
             //Elevar al Seeker y ponerlo a esperar una respuesta de su rescuer
             //acciones.add("moveUP");
             //acciones.add("moveUP");
-            
-            if (energy_u > (energy - 2*coste(acciones))){
+
+            if (energy_u > (energy - 2 * coste(acciones))) {
                 //Recargamos energia 
                 recarga();
             }
-            
+
             myStatus = "WAITING-RESCUER";
             return new ArrayList<>();
-            
+
         }
-        
+
         //En orden, mirar que se pueda ir a la siguiente casilla
         String casilla = casillas.get(0);
 
         int anguloCasilla;
         //Segun a la casilla a la que el drone decida ir:
 
-        switch(casilla){
+        switch (casilla) {
             case "NO":
                 anguloCasilla = -45;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]-1));
-                
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] - 1, position[1] - 1));
+
                 break;
             case "N":
                 anguloCasilla = 0;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1]-1));
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1] - 1));
                 break;
             case "NE":
                 anguloCasilla = 45;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]-1));
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] + 1, position[1] - 1));
                 break;
             case "E":
                 anguloCasilla = 90;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]));
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] + 1, position[1]));
                 break;
             case "SE":
                 anguloCasilla = 135;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]+1));
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] + 1, position[1] + 1));
                 break;
             case "S":
                 anguloCasilla = 180;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1]+1));
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1] + 1));
                 break;
             case "SO":
                 anguloCasilla = -135;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]+1));
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] - 1, position[1] + 1));
                 break;
             case "O":
                 anguloCasilla = -90;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]));
+                acciones = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] - 1, position[1]));
                 break;
         }
-        
+
         //Mirar si hay que recarga batería antes de realizar las acciones
         //Hemos quitado -altimeter
-        if (energy_u > (energy - coste(acciones))){
+        if (energy_u > (energy - coste(acciones))) {
             //Recargamos energia y volvemos a subir
             recarga();
-           // elevar();
+            // elevar();
         }
         return acciones;
     }
 
     /**
      * Método para enviar el punto de un alemán a un rescuer para que lo rescate
-     * 
+     *
      * @author Marina: implementación
      * @author Román: implementación
      * @author Javier: implementación
@@ -399,9 +437,8 @@ public class Seeker extends Drone{
         outRecueTeam.setConversationId(myConvID);
         outRecueTeam.setProtocol("REGULAR");
         outRecueTeam.setPerformative(ACLMessage.REQUEST);
-        
+
         this.send(outRecueTeam);
     }
 
-    
 }

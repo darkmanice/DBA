@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.Stack;
 
 /**
- * Agente abstracto que implementa operaciones que puede utilizar todo el equipo de rescate
+ * Agente abstracto que implementa operaciones que puede utilizar todo el equipo
+ * de rescate
  *
  * @author Marina: implementación
  * @author Román: implementación
@@ -45,7 +46,7 @@ public abstract class Drone extends IntegratedAgent {
     protected HashMap<String, Integer> tienda0 = new HashMap<String, Integer>();
     protected HashMap<String, Integer> tienda1 = new HashMap<String, Integer>();
     protected HashMap<String, Integer> tienda2 = new HashMap<String, Integer>();
-    
+
     //Sensores
     protected int memoria[][]; //Se inicializa con width x width 0, 1 si ya hemos pasado
     protected int position[] = new int[3]; //Posicion del drone
@@ -60,18 +61,17 @@ public abstract class Drone extends IntegratedAgent {
     protected double distance;
     protected int altimeter = 0;
     protected int energy;
-    
-    
+
     //Variables para conteo de la memoria del dron
     protected int iterador = 0;
     private int umbral_k = 800;
-    
+
     //Umbral para recargar la batería
-    protected int energy_u = 50; 
-    
+    protected int energy_u = 50;
+
     /**
      * Setup para inicializar nuestras variables.
-     * 
+     *
      * @author Marina: implementación
      * @author Román: implementación
      * @author Javier: implementación
@@ -105,15 +105,14 @@ public abstract class Drone extends IntegratedAgent {
         // To detect possible errors
         myError = false;
         myYP = new YellowPages();
-        
+
         //Problem
-        myProblem = "World6";
+        myProblem = "World2";
         myMap = new Map2DGrayscale();
-        
+
         //Panel de control
         myControlPanel = new TTYControlPanel(this.getAID());
-        
-        
+
         _exitRequested = false;
     }
 
@@ -217,7 +216,8 @@ public abstract class Drone extends IntegratedAgent {
     }
 
     /**
-     * Metodo para enviar el mensaje a una tienda y que nos devuelva su lista de productos
+     * Metodo para enviar el mensaje a una tienda y que nos devuelva su lista de
+     * productos
      *
      * @author Marina
      * @author Román
@@ -237,8 +237,10 @@ public abstract class Drone extends IntegratedAgent {
         return this.blockingReceive();
     }
 
-     /**
-     * Algoritmo para gestionar las compras, busca el producto mas barato de cada tienda y el mas barato de las tres tiendas
+    /**
+     * Algoritmo para gestionar las compras, busca el producto mas barato de
+     * cada tienda y el mas barato de las tres tiendas
+     *
      * @author Marina
      * @author Román
      * @author Javier
@@ -254,136 +256,135 @@ public abstract class Drone extends IntegratedAgent {
         //Por cada elemento de la lista de deseos
         for (String elemento : miLista) {
             boolean compraCarga = true;
-  
-                //Actualizamos las tiendas
-                updateShops();
-                String eleccionTienda0 = "";
-                String eleccionTienda1 = "";
-                String eleccionTienda2 = "";
 
-                int precioAuxiliar0 = 0;
-                int precioAuxiliar1 = 0;
-                int precioAuxiliar2 = 0;
-                
-                //Comprobamos en cada tienda cual es el articulo mas barato con ese nombre
-                //TIENDA 0
-                for (String i : tienda0.keySet()) {
-                    String auxiliar = i.split("#")[0];
-                    if (auxiliar.equals(elemento)) {
-                        if (eleccionTienda0.equals("")) {
+            //Actualizamos las tiendas
+            updateShops();
+            String eleccionTienda0 = "";
+            String eleccionTienda1 = "";
+            String eleccionTienda2 = "";
+
+            int precioAuxiliar0 = 0;
+            int precioAuxiliar1 = 0;
+            int precioAuxiliar2 = 0;
+
+            //Comprobamos en cada tienda cual es el articulo mas barato con ese nombre
+            //TIENDA 0
+            for (String i : tienda0.keySet()) {
+                String auxiliar = i.split("#")[0];
+                if (auxiliar.equals(elemento)) {
+                    if (eleccionTienda0.equals("")) {
+                        eleccionTienda0 = i;
+                        precioAuxiliar0 = tienda0.get(i);
+                    } else { //Hay que elegir el precio mas barato
+                        if (precioAuxiliar0 > tienda0.get(i)) { //Intercambiamos el articulo
                             eleccionTienda0 = i;
                             precioAuxiliar0 = tienda0.get(i);
-                        } else { //Hay que elegir el precio mas barato
-                            if (precioAuxiliar0 > tienda0.get(i)) { //Intercambiamos el articulo
-                                eleccionTienda0 = i;
-                                precioAuxiliar0 = tienda0.get(i);
-                            }
                         }
                     }
                 }
-                
-                //TIENDA 1
-                for (String i : tienda1.keySet()) {
-                    String auxiliar = i.split("#")[0];
-                    if (auxiliar.equals(elemento)) {
-                        if (eleccionTienda1.equals("")) {
+            }
+
+            //TIENDA 1
+            for (String i : tienda1.keySet()) {
+                String auxiliar = i.split("#")[0];
+                if (auxiliar.equals(elemento)) {
+                    if (eleccionTienda1.equals("")) {
+                        eleccionTienda1 = i;
+                        precioAuxiliar1 = tienda1.get(i);
+                    } else { //Hay que elegir el precio mas barato
+                        if (precioAuxiliar1 > tienda1.get(i)) { //Intercambiamos el articulo
                             eleccionTienda1 = i;
                             precioAuxiliar1 = tienda1.get(i);
-                        } else { //Hay que elegir el precio mas barato
-                            if (precioAuxiliar1 > tienda1.get(i)) { //Intercambiamos el articulo
-                                eleccionTienda1 = i;
-                                precioAuxiliar1 = tienda1.get(i);
-                            }
                         }
                     }
                 }
-                
-                //TIENDA 2
-                for (String i : tienda2.keySet()) {
-                    String auxiliar = i.split("#")[0];
-                    if (auxiliar.equals(elemento)) {
-                        if (eleccionTienda2.equals("")) {
+            }
+
+            //TIENDA 2
+            for (String i : tienda2.keySet()) {
+                String auxiliar = i.split("#")[0];
+                if (auxiliar.equals(elemento)) {
+                    if (eleccionTienda2.equals("")) {
+                        eleccionTienda2 = i;
+                        precioAuxiliar2 = tienda2.get(i);
+                    } else { //Hay que elegir el precio mas barato
+                        if (precioAuxiliar2 > tienda2.get(i)) { //Intercambiamos el articulo
                             eleccionTienda2 = i;
                             precioAuxiliar2 = tienda2.get(i);
-                        } else { //Hay que elegir el precio mas barato
-                            if (precioAuxiliar2 > tienda2.get(i)) { //Intercambiamos el articulo
-                                eleccionTienda2 = i;
-                                precioAuxiliar2 = tienda2.get(i);
-                            }
                         }
                     }
                 }
+            }
 
-                //Comparamos los elementos elegidos de las tres tiendas
-                ArrayList<Integer> precios = new ArrayList<>();
-                precios.add(precioAuxiliar0);
-                precios.add(precioAuxiliar1);
-                precios.add(precioAuxiliar2);
+            //Comparamos los elementos elegidos de las tres tiendas
+            ArrayList<Integer> precios = new ArrayList<>();
+            precios.add(precioAuxiliar0);
+            precios.add(precioAuxiliar1);
+            precios.add(precioAuxiliar2);
 
-                int min = Integer.MAX_VALUE, indice = 0;
-                for (int i = 0; i < precios.size(); i++) {
-                    if (precios.get(i) < min) {
-                        min = precios.get(i);
-                        indice = i;
-                    }
+            int min = Integer.MAX_VALUE, indice = 0;
+            for (int i = 0; i < precios.size(); i++) {
+                if (precios.get(i) < min) {
+                    min = precios.get(i);
+                    indice = i;
+                }
+            }
+
+            //Obtenemos la eleccion y enviamos accion de comprar
+            String eleccionF = "", tiendaF = "";
+            int precioF = -1;
+            switch (indice) {
+                case 0:
+                    eleccionF = eleccionTienda0;
+                    tiendaF = myShops.get(0);
+                    precioF = precioAuxiliar0;
+                    break;
+                case 1:
+                    eleccionF = eleccionTienda1;
+                    tiendaF = myShops.get(1);
+                    precioF = precioAuxiliar1;
+                    break;
+                case 2:
+                    eleccionF = eleccionTienda2;
+                    tiendaF = myShops.get(2);
+                    precioF = precioAuxiliar2;
+                    break;
+            }
+
+            if (precioF <= myCoins.size() && eleccionF.contains("#")) {
+                in = sendComprar(eleccionF, tiendaF, precioF);
+            } else {
+                auxCoins = new Stack();
+                Info("No se puede comprar o no quedan existencias");
+                compraCarga = false;
+                return;
+            }
+
+            //Guardar los productos que hemos comprado
+            myError = (in.getPerformative() != ACLMessage.INFORM);
+            if (myError) {
+                Info("\t" + ACLMessage.getPerformative(in.getPerformative())
+                        + " Compra de productos ha fallado por: " + getDetailsLARVA(in));
+                //Volvemos a llenar el monedero
+                for (int i = 0; i < auxCoins.size(); i++) {
+                    myCoins.push((String) auxCoins.pop());
                 }
 
-                //Obtenemos la eleccion y enviamos accion de comprar
-                String eleccionF = "", tiendaF = "";
-                int precioF = -1;
-                switch (indice) {
-                    case 0:
-                        eleccionF = eleccionTienda0;
-                        tiendaF = myShops.get(0);
-                        precioF = precioAuxiliar0;
-                        break;
-                    case 1:
-                        eleccionF = eleccionTienda1;
-                        tiendaF = myShops.get(1);
-                        precioF = precioAuxiliar1;
-                        break;
-                    case 2:
-                        eleccionF = eleccionTienda2;
-                        tiendaF = myShops.get(2);
-                        precioF = precioAuxiliar2;
-                        break;
-                }
+            } else {
+                String producto = Json.parse(in.getContent()).asObject().get("reference").asString();
 
-                if (precioF <= myCoins.size() && eleccionF.contains("#")) {
-                    in = sendComprar(eleccionF, tiendaF, precioF);
+                if (producto.contains("CHARGE")) {
+
+                    this.myCharges.push(producto);
                 } else {
-                    auxCoins = new Stack();
-                    Info("No se puede comprar o no quedan existencias");
-                    compraCarga = false;
-                    return;
+                    this.mySensors.add(producto);
                 }
-
-                //Guardar los productos que hemos comprado
-                myError = (in.getPerformative() != ACLMessage.INFORM);
-                if (myError) {
-                    Info("\t" + ACLMessage.getPerformative(in.getPerformative())
-                            + " Compra de productos ha fallado por: " + getDetailsLARVA(in));
-                    //Volvemos a llenar el monedero
-                    for(int i = 0; i < auxCoins.size(); i++){
-                        myCoins.push((String) auxCoins.pop() );
-                    }
-                    
-                } else {
-                    String producto = Json.parse(in.getContent()).asObject().get("reference").asString();
-                    
-                    if(producto.contains("CHARGE")){
-                       
-                        this.myCharges.push(producto);
-                    }
-                    else{
-                        this.mySensors.add(producto);
-                    }
-                    auxCoins = new Stack();
-                }
+                auxCoins = new Stack();
+            }
         }
     }
 
-     /**
+    /**
      * Metodo para enviar el mensaje de compra
      *
      * @author Marina
@@ -405,7 +406,7 @@ public abstract class Drone extends IntegratedAgent {
         //Añadimos tantas monedas como cueste el elemento
         for (int i = 0; i < precio; i++) {
             String actualCoin = (String) myCoins.pop();
-            
+
             array.add(actualCoin);
             auxCoins.push(actualCoin);
         }
@@ -417,9 +418,10 @@ public abstract class Drone extends IntegratedAgent {
         return this.blockingReceive();
     }
 
-     /**
-     * Metodo para enviar un mensaje al controlador de que nos vamos del programa
-     * 
+    /**
+     * Metodo para enviar un mensaje al controlador de que nos vamos del
+     * programa
+     *
      * @author Marina
      * @author Román
      * @author Javier
@@ -435,9 +437,28 @@ public abstract class Drone extends IntegratedAgent {
         send(out);
     }
 
-     /**
+    /**
+     * Metodo para enviar un mensaje al controlador de que nos vamos del
+     * programa
+     *
+     * @author Marina
+     * @author Román
+     * @author Javier
+     */
+    protected void sendDeadCoach() {
+        out = new ACLMessage();
+        out.setSender(getAID());
+        out.addReceiver(new AID(myCoach, AID.ISLOCALNAME));
+        out.setContent("DEAD");
+        out.setProtocol("ANALYTICS");
+        out.setEncoding(_myCardID.getCardID());
+        out.setPerformative(ACLMessage.INFORM);
+        send(out);
+    }
+
+    /**
      * Metodo para actualizar las tiendas y guardarlas en tres hash map globales
-     * 
+     *
      * @author Marina
      * @author Román
      * @author Javier
@@ -496,34 +517,33 @@ public abstract class Drone extends IntegratedAgent {
         return true;
     }
 
-     /**
+    /**
      * Metodo para inicializar sensores
-     * 
+     *
      * @author Marina
      * @author Román
      * @author Javier
      * @param mapa Mapa del mundo
      */
-    protected void inicializarSensores( Map2DGrayscale mapa){
+    protected void inicializarSensores(Map2DGrayscale mapa) {
         //Captamos el mapa
         myMap = mapa;
-        
+
         //Sensores
-        
-        memoria = new int[myMap.getWidth()+4][myMap.getWidth()+4];
-        thermal = new double[myMap.getWidth()+4][myMap.getWidth()+4];
+        memoria = new int[myMap.getWidth() + 4][myMap.getWidth() + 4];
+        thermal = new double[myMap.getWidth() + 4][myMap.getWidth() + 4];
 
         //Inicializar las matrices
-        for (int i = 0; i < myMap.getWidth()+1; i++) {
-            for (int j = 0; j < myMap.getWidth()+1; j++) {
+        for (int i = 0; i < myMap.getWidth() + 1; i++) {
+            for (int j = 0; j < myMap.getWidth() + 1; j++) {
                 memoria[i][j] = -umbral_k;
                 thermal[i][j] = -1;
             }
         }
     }
-    
+
     /**
-     * Metodo para enviar el mensaje de suscripción al WM 
+     * Metodo para enviar el mensaje de suscripción al WM
      *
      * @author Marina
      * @author Román
@@ -552,9 +572,10 @@ public abstract class Drone extends IntegratedAgent {
         this.send(out);
         return this.blockingReceive();
     }
-    
+
     /**
-     * Metodo para leer los sensores y almacenarlos en sus variables globales correspondientes
+     * Metodo para leer los sensores y almacenarlos en sus variables globales
+     * correspondientes
      *
      * @author Marina
      * @author Román
@@ -574,12 +595,11 @@ public abstract class Drone extends IntegratedAgent {
         this.send(out);
 
         in = this.blockingReceive();
-        
-        
+
         String answer = in.getContent();
         json = Json.parse(answer).asObject();
-        
-        if(!answer.contains("perceptions")){
+
+        if (!answer.contains("perceptions")) {
             in = this.blockingReceive();
             answer = in.getContent();
             json = Json.parse(answer).asObject();
@@ -624,8 +644,6 @@ public abstract class Drone extends IntegratedAgent {
 
         //Rellenar lidar y thermal tras leer el resto de sonsores
         for (JsonValue j : json.get("details").asObject().get("perceptions").asArray()) {
-            
-            
 
             if (j.asObject().get("sensor").asString().equals("lidar")) {
                 for (int i = 0; i < 7; i++) {
@@ -648,12 +666,12 @@ public abstract class Drone extends IntegratedAgent {
             }
 
         }
-        
+
         //Calculo del altimetro
         altimeter = position[2] - myMap.getLevel(position[0], position[1]);
 
     }
-    
+
     /**
      * Metodo para elevar un dron a maxima altura del mundo
      *
@@ -667,14 +685,18 @@ public abstract class Drone extends IntegratedAgent {
         while (position[2] < this.altura_max) {
             if (energy_u > (energy - 5)) {
                 Info("No tengo bateria para elevar, recargo");
-                if(!recarga()){
+                if (!recarga()) {
                     return false;
                 }
             }
-            
+
             position[2] += 5;
-            
+
             in = sendAction("moveUP");
+            if (esError(in)) {
+                myStatus = "CHECKOUT-LARVA";
+                return false;
+            }
 
             myError = (in.getPerformative() != ACLMessage.INFORM);
             if (myError) {
@@ -698,7 +720,7 @@ public abstract class Drone extends IntegratedAgent {
      * @param accion String con el nombre de la acción
      * @return respuesta al mensaje
      */
-    protected ACLMessage sendAction(String accion){
+    protected ACLMessage sendAction(String accion) {
         out = new ACLMessage();
         JsonObject contenido = new JsonObject();
         contenido.add("operation", accion);
@@ -708,21 +730,22 @@ public abstract class Drone extends IntegratedAgent {
         out.setPerformative(ACLMessage.REQUEST);
         out.addReceiver(new AID(myWorldManager, AID.ISLOCALNAME));
         out.setSender(this.getAID());
-        
+
         this.send(out);
         return this.blockingReceive();
     }
-    
+
     /**
-     * Metodo para recargar bateria, compramos un ticket de recarga y enviamos mensaje
+     * Metodo para recargar bateria, compramos un ticket de recarga y enviamos
+     * mensaje
      *
      * @author Marina
      * @author Román
      * @author Javier
      * @return exito/fracaso de la operacion
      */
-    protected boolean recarga(){
-        if(myCharges.isEmpty()){
+    protected boolean recarga() {
+        if (myCharges.isEmpty()) {
             ArrayList<String> comprarCharges = new ArrayList<>();
             comprarCharges.add("CHARGE");
             comprar(comprarCharges);
@@ -731,11 +754,14 @@ public abstract class Drone extends IntegratedAgent {
         Info("Recargando...");
         int aux = altimeter;
         int aux2 = energy;
-        
-        
+
         for (int i = 0; i < aux / 5; i++) {
-            if(aux > 0){
+            if (aux > 0) {
                 in = sendAction("moveD");
+                if (esError(in)) {
+                    myStatus = "CHECKOUT-LARVA";
+                    return false;
+                }
                 myError = (in.getPerformative() != ACLMessage.INFORM);
                 if (myError) {
                     Info(ACLMessage.getPerformative(in.getPerformative())
@@ -747,8 +773,12 @@ public abstract class Drone extends IntegratedAgent {
                 //energy -= 5;
             }
         }
-        
+
         in = sendAction("touchD");
+        if (esError(in)) {
+            myStatus = "CHECKOUT-LARVA";
+            return false;
+        }
         myError = (in.getPerformative() != ACLMessage.INFORM);
         if (myError) {
             Info(ACLMessage.getPerformative(in.getPerformative())
@@ -756,8 +786,7 @@ public abstract class Drone extends IntegratedAgent {
                     + " debido a " + getDetailsLARVA(in));
             return false;
         }
-        
-        
+
         //recharge
         in = sendRecharge();
 
@@ -771,7 +800,7 @@ public abstract class Drone extends IntegratedAgent {
 
         return true;
     }
-    
+
     /**
      * Metodo para enviar el mensaje de recarga al servidor
      *
@@ -780,7 +809,7 @@ public abstract class Drone extends IntegratedAgent {
      * @author Javier
      * @return respuesta al mensaje
      */
-    protected ACLMessage sendRecharge(){
+    protected ACLMessage sendRecharge() {
         out = new ACLMessage();
         out.addReceiver(new AID(myWorldManager, AID.ISLOCALNAME));
         out.setSender(this.getAID());
@@ -791,19 +820,20 @@ public abstract class Drone extends IntegratedAgent {
         out.setConversationId(myConvID);
         out.setProtocol("REGULAR");
         out.setPerformative(ACLMessage.REQUEST);
-        
+
         this.send(out);
         return this.blockingReceive();
     }
-    
+
     /**
-     * Metodo para enviar al controlador un mensaje de que hemos acabado de comprar
+     * Metodo para enviar al controlador un mensaje de que hemos acabado de
+     * comprar
      *
      * @author Marina
      * @author Román
      * @author Javier
      */
-    protected void sendFinCompra(){
+    protected void sendFinCompra() {
         ACLMessage outPantoja = new ACLMessage();
         outPantoja.setSender(this.getAID());
         outPantoja = new ACLMessage();
@@ -811,11 +841,11 @@ public abstract class Drone extends IntegratedAgent {
         outPantoja.addReceiver(new AID("Pantoja", AID.ISLOCALNAME));
         outPantoja.setProtocol("REGULAR");
         outPantoja.setPerformative(ACLMessage.INFORM);
-        
+
         this.send(outPantoja);
-        
+
     }
-    
+
     /**
      * Metodo para calcular el coste de un array de acciones
      *
@@ -825,11 +855,11 @@ public abstract class Drone extends IntegratedAgent {
      * @param acciones ArrayList<String> vector de acciones
      * @return coste de las acciones + coste de leer los sensores
      */
-    protected int coste(ArrayList<String> acciones){
+    protected int coste(ArrayList<String> acciones) {
         int coste = mySensors.size();
-       
-        for(int i=0; i<acciones.size(); i++){
-            switch(acciones.get(i)){
+
+        for (int i = 0; i < acciones.size(); i++) {
+            switch (acciones.get(i)) {
                 case "moveF":
                     coste += 1;
                     break;
@@ -850,23 +880,24 @@ public abstract class Drone extends IntegratedAgent {
                     break;
             }
         }
-        
+
         return coste;
     }
-    
+
     /**
-     * Metodo reutilizado de la P2, calcula la diferencia de distancias y las almacena en un array
-     * 
+     * Metodo reutilizado de la P2, calcula la diferencia de distancias y las
+     * almacena en un array
+     *
      * @author Marina: implementación
      * @author Román: implementación
      * @author Javier: implementación
      * @param casillas casillas a las que el drone puede ir
      * @param distancias distancias de las casillas a las que el drone puede ir
      */
-    protected void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias){
-        if (position[0] < (myMap.getWidth() - 1)){
+    protected void diferenciaDistancias(ArrayList<String> casillas, ArrayList<Double> distancias) {
+        if (position[0] < (myMap.getWidth() - 1)) {
             casillas.add("E");
-            if(iterador - memoria[position[0]+1][position[1]] < umbral_k){
+            if (iterador - memoria[position[0] + 1][position[1]] < umbral_k) {
                 distancias.add(10000.0);
             } else {
                 distancias.add(Math.abs((double) (angular + 360) % 360 - (90)));
@@ -880,76 +911,72 @@ public abstract class Drone extends IntegratedAgent {
                 distancias.add(Math.abs((double) (angular + 360) % 360 - (135)));
             }
         }
-        
-        if (position[1] < (myMap.getWidth() - 1)){
+
+        if (position[1] < (myMap.getWidth() - 1)) {
             casillas.add("S");
-            if(iterador - memoria[position[0]][position[1]+1] < umbral_k){
+            if (iterador - memoria[position[0]][position[1] + 1] < umbral_k) {
                 distancias.add(10000.0);
-            }
-            else {
-                distancias.add(Math.abs((double) (angular+360)%360 - (180)));
+            } else {
+                distancias.add(Math.abs((double) (angular + 360) % 360 - (180)));
             }
         }
-        
-        if (position[0] > 0 && position[1] > 0){
+
+        if (position[0] > 0 && position[1] > 0) {
             casillas.add("NO");
-            if(iterador - memoria[position[0]-1][position[1]-1] < umbral_k){
+            if (iterador - memoria[position[0] - 1][position[1] - 1] < umbral_k) {
                 distancias.add(10000.0);
-            }
-            else {
-                distancias.add(Math.abs((double) (angular +360)%360 - (315)));
+            } else {
+                distancias.add(Math.abs((double) (angular + 360) % 360 - (315)));
             }
         }
-        
-        if (position[1] > 0){
+
+        if (position[1] > 0) {
             casillas.add("N");
-            if(iterador - memoria[position[0]][position[1]-1] < umbral_k){
+            if (iterador - memoria[position[0]][position[1] - 1] < umbral_k) {
                 distancias.add(10000.0);
-            }
-            else {
+            } else {
                 distancias.add(Math.abs((double) angular));
             }
         }
-        
-        if (position[1] > 0 && position[0] < (myMap.getWidth() - 1)){
+
+        if (position[1] > 0 && position[0] < (myMap.getWidth() - 1)) {
             casillas.add("NE");
-            if(iterador - memoria[position[0]+1][position[1]-1] < umbral_k){
+            if (iterador - memoria[position[0] + 1][position[1] - 1] < umbral_k) {
                 distancias.add(10000.0);
-            }
-            else {
-               distancias.add(Math.abs((double) (angular+360)%360 - (45)));
+            } else {
+                distancias.add(Math.abs((double) (angular + 360) % 360 - (45)));
             }
         }
-        
-        if (position[1] < (myMap.getWidth() - 1) && position[0] > 0){
+
+        if (position[1] < (myMap.getWidth() - 1) && position[0] > 0) {
             casillas.add("SO");
-            if(iterador - memoria[position[0]-1][position[1]+1] < umbral_k){
+            if (iterador - memoria[position[0] - 1][position[1] + 1] < umbral_k) {
                 distancias.add(10000.0);
-            }
-            else {
-                distancias.add(Math.abs((double) (angular+360)%360 - (225)));
+            } else {
+                distancias.add(Math.abs((double) (angular + 360) % 360 - (225)));
             }
         }
-        
-        if (position[0] > 0){
+
+        if (position[0] > 0) {
             casillas.add("O");
-            if(iterador - memoria[position[0]-1][position[1]] < umbral_k){
+            if (iterador - memoria[position[0] - 1][position[1]] < umbral_k) {
                 distancias.add(10000.0);
-            }
-            else {
-                distancias.add(Math.abs((double) (angular+360)%360 - (270)));
+            } else {
+                distancias.add(Math.abs((double) (angular + 360) % 360 - (270)));
             }
         }
     }
-    
+
     /**
-     * Metodo reutilizado de la P2, metodo para ordenar un array de menor a mayor
-     * 
+     * Metodo reutilizado de la P2, metodo para ordenar un array de menor a
+     * mayor
+     *
      * @author Marina: implementación
      * @author Román: implementación
      * @author Javier: implementación
      * @param casillas Array con las casillas a las que el drone puede ir
-     * @param distancias Array con las distancias a las casillas que el drone puede ir
+     * @param distancias Array con las distancias a las casillas que el drone
+     * puede ir
      */
     protected void burbuja(ArrayList<String> casillas, ArrayList<Double> distancias) {
         //Ordenamos por orden de distancias
@@ -978,8 +1005,10 @@ public abstract class Drone extends IntegratedAgent {
     }
 
     /**
-     * Método reutilizado de la P2, calcula el numero de giros y subidas o bajadas que debe hacer el agente para movernos segun el angulo y la altura de la siguiente casilla a visitar
-     * 
+     * Método reutilizado de la P2, calcula el numero de giros y subidas o
+     * bajadas que debe hacer el agente para movernos segun el angulo y la
+     * altura de la siguiente casilla a visitar
+     *
      * @author Marina: implementación
      * @author Román: implementación
      * @author Javier: implementación
@@ -991,59 +1020,61 @@ public abstract class Drone extends IntegratedAgent {
         ArrayList<String> acciones = new ArrayList<>();
         int anguloCasilla;
         double direccionGiro;
-        int ngirosD=0;
-        int ngirosI=0;
-        int anguloAux = (compass+360)%360;
+        int ngirosD = 0;
+        int ngirosI = 0;
+        int anguloAux = (compass + 360) % 360;
         int diferenciaAltura;
         //calcular cuanto tiene que girar
-                  while( anguloAux != (angulo+360)%360 ){
-                      ngirosD++;
-                      anguloAux = (anguloAux+45)%360;
-                  }
-                  
-                  anguloAux = (compass+360)%360;
-                  
-                  while( anguloAux != (angulo+360)%360 ){
-                      ngirosI++;
-                      anguloAux = (anguloAux-45+360)%360;
-                  }
-                  
-                  if(ngirosD < ngirosI){
-                      for(int i = 0; i < ngirosD; i++){
-                          acciones.add("rotateR");
-                      }
-                  }
-                  else{
-                      for(int i = 0; i < ngirosI; i++){
-                          acciones.add("rotateL");
-                      }
-                  }
-                
-                //Mirar la altura de la casilla
-                diferenciaAltura = position[2] - (altura + 1);
-                if( Math.abs(diferenciaAltura/5) < 1){
+        while (anguloAux != (angulo + 360) % 360) {
+            ngirosD++;
+            anguloAux = (anguloAux + 45) % 360;
+        }
+
+        anguloAux = (compass + 360) % 360;
+
+        while (anguloAux != (angulo + 360) % 360) {
+            ngirosI++;
+            anguloAux = (anguloAux - 45 + 360) % 360;
+        }
+
+        if (ngirosD < ngirosI) {
+            for (int i = 0; i < ngirosD; i++) {
+                acciones.add("rotateR");
+            }
+        } else {
+            for (int i = 0; i < ngirosI; i++) {
+                acciones.add("rotateL");
+            }
+        }
+
+        //Mirar la altura de la casilla
+        diferenciaAltura = position[2] - (altura + 1);
+        if (Math.abs(diferenciaAltura / 5) < 1) {
+            acciones.add("moveF");
+        }
+        for (int i = 0; i < Math.abs(diferenciaAltura / 5); i++) {
+            if (diferenciaAltura >= 0) {
+                //Baja
+                if (i == 0) {
                     acciones.add("moveF");
                 }
-                for(int i = 0; i < Math.abs(diferenciaAltura/5); i++){
-                    if(diferenciaAltura >= 0){
-                        //Baja
-                        if(i == 0)
-                            acciones.add("moveF");
-                        acciones.add("moveD");
-                    } else {
-                        //Sube 
-                        acciones.add("moveUP");
-                        if(i == (Math.abs(diferenciaAltura/5) - 1))
-                            acciones.add("moveF");
-                    }
+                acciones.add("moveD");
+            } else {
+                //Sube 
+                acciones.add("moveUP");
+                if (i == (Math.abs(diferenciaAltura / 5) - 1)) {
+                    acciones.add("moveF");
                 }
-                
-        
+            }
+        }
+
         return acciones;
     }
-    
+
     /**
-     * Metodo que dada una posicion calcula y ejecuta las acciones que nos llevarán a ese punto
+     * Metodo que dada una posicion calcula y ejecuta las acciones que nos
+     * llevarán a ese punto
+     *
      * @author Marina: implementación
      * @author Román: implementación
      * @author Javier: implementación
@@ -1052,87 +1083,100 @@ public abstract class Drone extends IntegratedAgent {
         double distancia;
         double angulo;
         ArrayList<String> actions = new ArrayList<>();
-        
-        if (2*energy_u > energy ) {
+
+        if (2 * energy_u > energy) {
             recarga();
             energy = 1000;
         }
-        
+
         int anguloCasilla;
-        Point orig = new Point(destinox,destinoy);
+        Point orig = new Point(destinox, destinoy);
         Point here;
-        
+
         //Leer sensores por primera vez
         readSensores();
-        do{
+        do {
             //Calculamos el angulo segun el destino
             here = new Point(position[0], position[1]);
             distancia = here.fastDistanceXYTo(orig);
-             
-            angulo = Compass.VECTOR[Compass.NORTH].angleXYTo(new Vector(here,orig));
-            
+
+            angulo = Compass.VECTOR[Compass.NORTH].angleXYTo(new Vector(here, orig));
+
             //Calculamos la casilla segun el angulo obtenido
-            if(angulo >= (-45 - 22.5) && angulo < (-45 + 22.5)){
+            if (angulo >= (-45 - 22.5) && angulo < (-45 + 22.5)) {
                 anguloCasilla = -45;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]-1)); 
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] - 1, position[1] - 1));
             }
-            if(angulo >= (0 - 22.5) && angulo < (45 - 22.5)){
+            if (angulo >= (0 - 22.5) && angulo < (45 - 22.5)) {
                 anguloCasilla = 0;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1]-1));
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1] - 1));
             }
-            if(angulo >= (45 - 22.5) && angulo < (90 - 22.5)){
+            if (angulo >= (45 - 22.5) && angulo < (90 - 22.5)) {
                 anguloCasilla = 45;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]-1));
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] + 1, position[1] - 1));
             }
-            if(angulo >= (90 - 22.5) && angulo < (135 - 22.5)){
+            if (angulo >= (90 - 22.5) && angulo < (135 - 22.5)) {
                 anguloCasilla = 90;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]));  
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] + 1, position[1]));
             }
-            if(angulo >= (135 - 22.5) && angulo < (180 - 22.5)){
+            if (angulo >= (135 - 22.5) && angulo < (180 - 22.5)) {
                 anguloCasilla = 135;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]+1, position[1]+1));
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] + 1, position[1] + 1));
             }
-            if(angulo >= (180 - 22.5) && angulo < (-135 - 22.5)){
+            if (angulo >= (180 - 22.5) && angulo < (-135 - 22.5)) {
                 anguloCasilla = 180;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1]+1));
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0], position[1] + 1));
             }
-            if(angulo < (-135 + 22.5) && angulo >= (-135 - 22.5)){
+            if (angulo < (-135 + 22.5) && angulo >= (-135 - 22.5)) {
                 anguloCasilla = -135;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]+1));
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] - 1, position[1] + 1));
             }
-            if(angulo >= (-90 - 22.5) && angulo < (-90 + 22.5)){
+            if (angulo >= (-90 - 22.5) && angulo < (-90 + 22.5)) {
                 anguloCasilla = -90;
                 //Calculamos cuanto tiene que girar, subir o bajar
-                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0]-1, position[1]));  
+                actions = calculaGiroySubida(anguloCasilla, myMap.getLevel(position[0] - 1, position[1]));
             }
-            
+
             //Mirar si hay que recarga batería antes de realizar las acciones
-            if (energy_u > (energy - coste(actions) - altimeter)){
+            if (energy_u > (energy - coste(actions) - altimeter)) {
                 //Recargamos energia y volvemos a subir
                 recarga();
                 energy = 1000;
-               // elevar();
-            }
-            else{
+                // elevar();
+            } else {
                 energy -= coste(actions);
             }
-            
+
             //Para cada accion, enviar mensaje al servidor
-            for(String a : actions){
+            for (String a : actions) {
                 in = sendAction(a);
+                if (esError(in)) {
+                    myStatus = "CHECKOUT-LARVA";
+                    break;
+                }
             }
             //Actualizar sensores
             readSensores();
             energy -= mySensors.size();
-        }while(position[0] != destinox || position[1] != destinoy);
-        
+        } while (position[0] != destinox || position[1] != destinoy);
 
+    }
+
+    protected boolean esError(ACLMessage in) {
+        if (in.getPerformative() == ACLMessage.FAILURE
+                || in.getPerformative() == ACLMessage.REFUSE
+                || in.getPerformative() == ACLMessage.NOT_UNDERSTOOD) {
+            Info("\t" + ACLMessage.getPerformative(in.getPerformative())
+                    + " Envío ha fallado por: " + getDetailsLARVA(in));
+            return true;
+        }
+        return false;
     }
 }

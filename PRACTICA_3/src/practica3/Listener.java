@@ -148,7 +148,7 @@ public class Listener extends IntegratedAgent {
             case "LISTENING":
                 in = blockingReceive();
                 if(in.getPerformative() == ACLMessage.INFORM){
-                    Info("RADIO: " + in.getContent());
+                    //Info("RADIO: " + in.getContent());
                     myStatus = "LISTENING";
                 }
                 else{

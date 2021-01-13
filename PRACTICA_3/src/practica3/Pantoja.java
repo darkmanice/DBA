@@ -54,7 +54,7 @@ public class Pantoja extends IntegratedAgent {
         myService = "Analytics group Cellnex";
 
         // The world I am going to open
-        myWorld = "World6";
+        myWorld = "World2";
 
         // First state of the agent
         myStatus = "CHECKIN-LARVA";
@@ -247,6 +247,11 @@ public class Pantoja extends IntegratedAgent {
                     in = blockingReceive();
                     if (in.getContent().equals("LOGOUT")) {
                         contador--;
+                    }
+                    else if (in.getContent().equals("DEAD")) {
+                        //Enviar al resto de drones que tienen que salir
+                        
+                        contador = 0;
                     }
                 }
 

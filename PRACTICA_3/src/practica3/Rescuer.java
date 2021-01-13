@@ -225,15 +225,15 @@ public class Rescuer extends Drone {
                 irA(destinox, destinoy);
 
                 rescatar();
-                sendRescued();
-                in = sendAction("moveUP");
                 
-
                 irA(CoordInicio[0], CoordInicio[1]);
                 readSensores();
                 
                 //Usamos la funcion rescatar para bajar
-                rescatar();
+                //Mandamos el mensaje de respuesta
+                recarga();
+                Info("Dejo al aleman en el suelo");
+                sendRescued();
                 
                 myStatus = "WAITING-TARGET";
 
@@ -244,6 +244,14 @@ public class Rescuer extends Drone {
                 //TODO: Mandar mensaje al coach de que me voy
                 Info("Haciendo checkout de LARVA en" + _identitymanager);
                 sendLogoutCoach();
+                in = sendCheckoutLARVA(_identitymanager);
+                myStatus = "EXIT";
+                break;
+                
+            case "CHECKOUT-LARVA-ERROR":
+                //TODO: Mandar mensaje al coach de que me voy
+                Info("Haciendo checkout de LARVA en" + _identitymanager);
+                sendDeadCoach();
                 in = sendCheckoutLARVA(_identitymanager);
                 myStatus = "EXIT";
                 break;
@@ -284,6 +292,10 @@ public class Rescuer extends Drone {
 
         for (String r : rescate) {
             in = sendAction(r);
+            if(esError(in)){
+                myStatus = "CHECKOUT-LARVA";
+                return;
+            }
         }
         energy -= coste(rescate);
         Info("GERETTET !!!");
@@ -300,11 +312,11 @@ public class Rescuer extends Drone {
         ACLMessage outRescueTeam = new ACLMessage();
         outRescueTeam.setSender(this.getAID());
         outRescueTeam.addReceiver(new AID(myPartner, AID.ISLOCALNAME));
-        outRescueTeam.setContent("");
+        outRescueTeam.setContent("RESCUED");
         outRescueTeam.setConversationId(myConvID);
         outRescueTeam.setProtocol("REGULAR");
         outRescueTeam.setPerformative(ACLMessage.INFORM);
-
+        Info("Envio que ya he terminado a " + myPartner);
         this.send(outRescueTeam);
     }
     
@@ -312,5 +324,7 @@ public class Rescuer extends Drone {
     protected int coste(ArrayList<String> acciones){
         return 4*super.coste(acciones);
     }
+
+    
 
 }
