@@ -249,7 +249,7 @@ public class Seeker extends Drone{
                 in = blockingReceive();
                
                 if (in.getPerformative() == ACLMessage.INFORM) {
-                    myStatus = "SEEKING";
+                    myStatus = "CHECKOUT-LARVA";
                 }
                 
                 break;

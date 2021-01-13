@@ -810,6 +810,7 @@ public abstract class Drone extends IntegratedAgent {
         outPantoja.setContent("");
         outPantoja.addReceiver(new AID("Pantoja", AID.ISLOCALNAME));
         outPantoja.setProtocol("REGULAR");
+        outPantoja.setPerformative(ACLMessage.INFORM);
         
         this.send(outPantoja);
         

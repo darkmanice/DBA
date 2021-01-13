@@ -229,9 +229,13 @@ public class Pantoja extends IntegratedAgent {
                 //2.Ramon (Rescuer) puede comprar
                 in = sendPuedesComprar("Ramon");
                 
+                //3.Gasset (Seeker) puede comprar
+                //4.Ortega (Rescuer) puede comprar
+                
                 
                 sendLoginProblem("Ramon");
                 sendLoginProblem("Cajal");
+                //logins de la otra pareja
                 
                 myStatus = "WAITING";
                 break;
@@ -484,7 +488,7 @@ public class Pantoja extends IntegratedAgent {
         out.setContent("");
         out.setConversationId(myConvID);
         out.setProtocol("ANALYTICS");
-        out.setPerformative(ACLMessage.REQUEST);
+        out.setPerformative(ACLMessage.QUERY_REF);
         send(out);
         return this.blockingReceive();
     }
@@ -505,7 +509,7 @@ public class Pantoja extends IntegratedAgent {
         out.setContent("");
         out.setConversationId(myConvID);
         out.setProtocol("REGULAR");
-        out.setPerformative(ACLMessage.REQUEST);
+        out.setPerformative(ACLMessage.QUERY_REF);
         send(out);
     }
 }
